@@ -1,4 +1,4 @@
-package com.itcentrex.ctsffake.exceptions;
+package com.tix.etix.exceptions;
 
 public class BadRequestException extends RuntimeException {
 

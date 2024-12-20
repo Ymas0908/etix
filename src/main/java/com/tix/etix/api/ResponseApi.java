@@ -1,4 +1,4 @@
-package com.itcentrex.ctsffake.api;
+package com.tix.etix.api;
 
 import lombok.Getter;
 import lombok.Setter;

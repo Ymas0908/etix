@@ -1,15 +1,12 @@
-package com.itcentrex.ctsffake.api;
+package com.tix.etix.api;
 
 
-import com.itcentrex.ctsffake.exceptions.*;
+import com.tix.etix.exceptions.*;
+import com.tix.etix.exceptions.EntityNotExistsException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ControllerAdvice;
-
-import java.util.HashMap;
-import java.util.Map;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 
 
 @ControllerAdvice
