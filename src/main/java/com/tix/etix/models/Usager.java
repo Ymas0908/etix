@@ -1,5 +1,4 @@
 package com.tix.etix.models;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 @Entity

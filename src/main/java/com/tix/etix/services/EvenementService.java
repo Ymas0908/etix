@@ -2,7 +2,6 @@ package com.tix.etix.services;
 
 import com.tix.etix.models.Evenement;
 import com.tix.etix.models.enumeration.TypeEvenement;
-
 import java.util.List;
 
 public interface EvenementService {

@@ -1,6 +1,7 @@
 package com.tix.etix.models;
 
 import com.tix.etix.models.enumeration.TypeEvenement;
+import com.tix.etix.models.enumeration.TypeTicket;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 
@@ -16,11 +17,30 @@ private String urlImage;
     private TypeEvenement typeEvenement;
     private String lieu;
     private String promotteur;
+    private TypeTicket typeTicket;
 
     public Evenement() {
 
     }
+     public Evenement ( int idEvenement,String urlImage, String libelle, LocalDate dateEvenement, TypeEvenement typeEvenement, String lieu, String promotteur, TypeTicket typeTicket) {
+        this.idEvenement = idEvenement;
+        this.urlImage = urlImage;
+        this.libelle = libelle;
+        this.dateEvenement = dateEvenement;
+        this.typeEvenement = typeEvenement;
+        this.lieu = lieu;
+        this.promotteur = promotteur;
+        this.typeTicket = typeTicket;
 
+    }
+
+
+    public TypeTicket getTypeTicket() {
+        return typeTicket;
+    }
+    public void setTypeTicket(TypeTicket typeTicket) {
+        this.typeTicket = typeTicket;
+    }
 
     public Integer getIdEvenement() {
         return idEvenement;

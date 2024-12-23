@@ -1,5 +1,4 @@
 package com.tix.etix.models.enumeration;
-
 import java.util.List;
 
 public enum TypeEvenement {

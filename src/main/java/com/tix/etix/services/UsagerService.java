@@ -1,7 +1,6 @@
 package com.tix.etix.services;
 
 import com.tix.etix.models.Usager;
-
 import java.util.List;
 
 public interface UsagerService {

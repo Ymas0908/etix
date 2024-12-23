@@ -20,6 +20,7 @@ public class UsagerServiceImpl implements UsagerService {
 
     @Override
     public List<Usager> getUsagerByEmail(String email) {
+
         return usagerRepository.findByEmail(email);
     }
 

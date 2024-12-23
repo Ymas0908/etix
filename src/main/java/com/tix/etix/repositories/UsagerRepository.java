@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
-public interface UsagerRepository extends JpaRepository<Usager, Integer> {
+public interface  UsagerRepository extends JpaRepository<Usager, Integer> {
 
 
 
