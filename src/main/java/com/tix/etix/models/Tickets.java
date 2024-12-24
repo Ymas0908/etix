@@ -22,20 +22,23 @@ public class Tickets {
     @ManyToOne
     private Evenement evenement;
 
-    public Tickets( String reference,Evenement evenement, String libelle, String description, Double prix,TypeTicket typeTicket, Integer quantite , Integer idUsager) {
+    public Tickets( int id,String reference,Evenement evenement, String libelle, String description, Double prix,TypeTicket typeTicket, Integer quantite , Integer idUsager) {
+        this.id = id;
         this.reference = reference;
+        this.evenement = evenement;
         this.libelle = libelle;
         this.description = description;
         this.prix = prix;
         this.quantite = quantite;
         this.idUsager = idUsager;
         this.typeTicket = typeTicket;
-        this.evenement = evenement;
 
     }
     public Tickets() {
 
     }
+
+
 
     public TypeTicket getTypeTicket() {
         return typeTicket;

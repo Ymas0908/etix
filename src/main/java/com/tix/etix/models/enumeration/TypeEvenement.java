@@ -5,7 +5,8 @@ public enum TypeEvenement {
     CONCERT,
     SPECTACLE,
     MATCH,
-    FESTIVAL;
+    FESTIVAL,
+    PARTY;
 
     public static List<TypeEvenement> TypeEvenement() {
         return List.of(TypeEvenement.values());

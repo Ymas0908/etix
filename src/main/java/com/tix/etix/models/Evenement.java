@@ -13,6 +13,7 @@ public class Evenement {
     private Integer idEvenement;
 private String urlImage;
     private String libelle;
+    private String description;
     private LocalDate dateEvenement;
     private TypeEvenement typeEvenement;
     private String lieu;
@@ -22,7 +23,7 @@ private String urlImage;
     public Evenement() {
 
     }
-     public Evenement ( int idEvenement,String urlImage, String libelle, LocalDate dateEvenement, TypeEvenement typeEvenement, String lieu, String promotteur, TypeTicket typeTicket) {
+     public Evenement ( int idEvenement,String urlImage, String libelle, String description, LocalDate dateEvenement, TypeEvenement typeEvenement, String lieu, String promotteur, TypeTicket typeTicket) {
         this.idEvenement = idEvenement;
         this.urlImage = urlImage;
         this.libelle = libelle;
@@ -66,6 +67,13 @@ private String urlImage;
         this.libelle = libelle;
     }
 
+    public String getDescription() {
+        return description;
+    }
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     public LocalDate getDateEvenement() {
         return dateEvenement;
     }
@@ -98,13 +106,5 @@ private String urlImage;
         this.promotteur = promotteur;
     }
 
-    public Evenement(Integer idEvenement, String urlImage, String libelle, LocalDate dateEvenement, TypeEvenement typeEvenement, String lieu, String promotteur) {
-        this.idEvenement = idEvenement;
-        this.urlImage = urlImage;
-        this.libelle = libelle;
-        this.dateEvenement = dateEvenement;
-        this.typeEvenement = typeEvenement;
-        this.lieu = lieu;
-        this.promotteur = promotteur;
-    }
+
 }
