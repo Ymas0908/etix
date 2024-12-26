@@ -34,10 +34,12 @@ public class EvenementController {
     }
 
 
-    @GetMapping("/getEvenementsByLieu/{idLieu}")
+    @GetMapping("/getEvenementsByLieu/{lieu}")
     public ResponseEntity<Evenement> getEvenementsByLieu (@PathVariable("lieu") String lieu){
+        Evenement evenement = new Evenement();
+        evenement.setLieu(lieu);
+        return ResponseEntity.ok(evenement);
 
-        return ResponseEntity.ok(new Evenement(1,"https://cdn.tikerama.com/images/tiGAhOgXlvHv3ongFL3pEmQ0vxMnSoNOslRjk39T.jpg","Concert de Himra", "",LocalDate.of(2024, 12, 26), TypeEvenement.CONCERT,"Parc des expositions","Moov Africa",TypeTicket.VIP));
     }
 
     @GetMapping("/getByType/{type}")
@@ -58,9 +60,9 @@ public class EvenementController {
         evenements.add(new Evenement(1,"https://baab.ci/wp-content/uploads/2021/08/Festival-Grillades_BAAB.jpg","Festival des grillades","", LocalDate.of(2024, 12, 26), TypeEvenement.FESTIVAL,"Derrière le palais de la culture","Moov Africa",TypeTicket.GP));
         evenements.add(new Evenement(1,"https://cdn.tikerama.com/images/IRegnn7siaDMvfs2xvrn8Ov7qpPlEhPsGDzCGUEG.jpg","3XDAVS en concert","", LocalDate.of(2024, 12, 30), TypeEvenement.CONCERT,"Palais de la culture d'Abidjan","",TypeTicket.GP));
         evenements.add(new Evenement(1,"https://cdn.tikerama.com/images/TKTWBQ8FPX7bJUtcW5ZqNmbphqyhaKoHpIgFeI6E.jpg","Babi Last Night","", LocalDate.of(2024, 12, 31), TypeEvenement.PARTY," Abbatta Hôtel mangrove","",TypeTicket.GP));
+
         return ResponseEntity.ok(evenements);
     }
-
 
     @GetMapping("/getEvenementsByLibelle/{libelle}")
     public ResponseEntity<Evenement> getEvenementsByLibelle (@PathVariable("libelle") String libelle){
