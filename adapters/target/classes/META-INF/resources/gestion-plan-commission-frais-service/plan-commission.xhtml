@@ -1,0 +1,496 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:jsf="http://xmlns.jcp.org/jsf"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="title">Gestion plan de commission</ui:define>
+
+    <ui:define name="viewname">
+        <li>PLAN DE COMMISSION</li>
+        <li><i class="pi pi-chevron-right"></i></li>
+        <li>
+            <p:link outcome="/gestion-plan-commission-frais-service/plan-commission">GESTION DES PLANS DE REPARTITIONS</p:link>
+        </li>
+    </ui:define>
+    <ui:define name="content">
+        <div class="grid">
+            <h:form id="autorisationForm">
+                <div class="card mb-0">
+                    <div class="grid">
+                        <div class="col-10 md:col-8">
+                            <h3 class="font-bold mb-2">Gestion des plans de répartitions</h3>
+                        </div>
+                    </div>
+
+                    <div class="flex mt-5 mb-2">
+                        <div class="flex-1 flex flex-column">
+                            <h5>Liste des contributeurs (#{gestionDePlanCommissionMB.contributeurs.size()})</h5>
+                        </div>
+                    </div>
+                    <div class="grid">
+                        <div class="col-12">
+                            <p:dataTable id="contribs" var="contrib"
+                                         value="#{gestionDePlanCommissionMB.contributeurs}"
+                                         selectionMode="single"
+                                         reflow="true" scrollable="true" scrollHeight="400"
+                                         styleClass="contrib-table" emptyMessage="Aucun contributeur disponible"
+                                         selection="#{gestionDePlanCommissionMB.contributeur}"
+                                         rowKey="#{contrib.ID}" selectMode="single">
+                                <p:ajax event="rowSelect" update="paysForm, mmpForm"
+                                        listener="#{gestionDePlanCommissionMB.selectionnerContributeur()}"/>
+                                <p:column headerText="Raison sociale" filterBy="#{contrib.raisonSociale}">
+                                    <h:outputText value="#{contrib.raisonSociale}"/>
+                                </p:column>
+                                <p:column headerText="Nom du dirigeant" filterBy="#{contrib.nomDirigeant}">
+                                    <h:outputText value="#{contrib.nomDirigeant}"/>
+                                </p:column>
+                                <p:column headerText="Identifiant GIMpayt" filterBy="#{contrib.identifiantSocial}">
+                                    <h:outputText value="#{contrib.identifiantSocial}"/>
+                                </p:column>
+                                <p:column headerText="Type de contributeur"
+                                          filterBy="#{contrib.typeContributeur.toString()}">
+                                    <h:outputText value="#{contrib.typeContributeur.toString()}"/>
+                                </p:column>
+                            </p:dataTable>
+                        </div>
+                    </div>
+                </div>
+            </h:form>
+
+            <div class="grid mt-1">
+                <div class="col-12 xl:col-6">
+                    <h:form id="paysForm">
+                        <div class="card" style="height: 35vh">
+                            <h5>Liste des pays rattachés au contributeur (#{gestionDePlanCommissionMB.paysList.size()})</h5>
+                            <p:divider/>
+                            <p:dataTable id="idPaysTable" var="pays"
+                                         value="#{gestionDePlanCommissionMB.paysList}"
+                                         style="margin-bottom:0; height: 200px"
+                                         scrollHeight="200px"
+                                         styleClass="contrib-table overflow-y-scroll"
+                                         emptyMessage="Aucun pays disponible"
+                                         selection="#{gestionDePlanCommissionMB.pays}"
+                                         rowKey="#{pays.ID}" selectMode="single">
+                                <p:ajax event="rowSelect" update="mmpForm"
+                                        listener="#{gestionDePlanCommissionMB.selectionnerPays()}"/>
+                                <p:column headerText="Indicatif international">
+                                    <h:outputText value="#{pays.indicatifInternational}"/>
+                                </p:column>
+                                <p:column headerText="Nom">
+                                    <h:outputText value="#{pays.nom}"/>
+                                </p:column>
+                                <p:column headerText="Nationnalité">
+                                    <h:outputText value="#{pays.nationalite}"/>
+                                </p:column>
+                            </p:dataTable>
+                        </div>
+                    </h:form>
+                </div>
+
+                <div class="col-12 xl:col-6">
+                    <h:form id="mmpForm">
+                        <div class="card" style="height: 35vh">
+                            <h5>Liste des mini-places de marché rattachées au pays (#{gestionDePlanCommissionMB.mmps.size()})</h5>
+                            <p:divider/>
+                            <p:dataTable id="mmpTable" var="mmp"
+                                         value="#{gestionDePlanCommissionMB.mmps}"
+                                         reflow="true" rowKey="#{mmp.ID}"
+                                         style="margin-bottom:0; height: 200px"
+                                         scrollHeight="200px"
+                                         emptyMessage="Aucune mini-place de marché disponible."
+                                         styleClass="contrib-table overflow-y-scroll">
+                                <p:column headerText="Libellé">
+                                    <h:outputText value="#{mmp.libelle}"/>
+                                </p:column>
+                                <p:column headerText="Description">
+                                    <h:outputText value="#{mmp.description}"/>
+                                </p:column>
+                                <p:column headerText="Statut">
+                                    <h:outputText value="#{mmp.statutMmp}"/>
+                                </p:column>
+                                <p:column headerText="Action">
+                                    <p:commandButton icon="pi pi-eye" update="fraisTable,saveFormFrais"
+                                                     styleClass="rounded-button ui-button"
+                                                     action="#{gestionDePlanCommissionMB.selectionnerMmp()}">
+                                        <f:setPropertyActionListener value="#{mmp}"
+                                                                     target="#{gestionDePlanCommissionMB.mmp}"/>
+                                    </p:commandButton>
+
+                                </p:column>
+                            </p:dataTable>
+                        </div>
+                    </h:form>
+                </div>
+            </div>
+        </div>
+
+
+        <p:sidebar widgetVar="commissionPlanSidebar"
+                   styleClass="w-full lg:w-6 h-full overflow-y-auto"
+                   position="right">
+            <h3 class="font-bold"> Edition d'un plan de répartition </h3>
+            <p:divider styleClass="mt-0"/>
+            <div class="grid">
+                <div class="col-12 overflow-x-hidden">
+                    <div class="card">
+                        <div class="mb-3">
+                            <div class="col-12">
+                                <h:form id="fraisTable">
+                                    <h5>Frais à repartir</h5>
+                                    <h6 class="my-3 "><i class="pi pi-info-circle"></i>
+                                        Liste des frais à repartir (#{gestionDePlanCommissionMB.fraisArepartirsList.size()})
+                                    </h6>
+                                    <p:dataTable widgetVar="idFrais"
+                                                 var="frais"
+                                                 value="#{gestionDePlanCommissionMB.fraisArepartirsList}"
+                                                 selection="#{gestionDePlanCommissionMB.fraisArepartir}"
+                                                 lazy="false"
+                                                 reflow="true"
+                                                 emptyMessage="Aucun frais disponible"
+                                                 rowKey="#{frais.ID}"
+                                                 scrollable="true"
+                                                 scrollHeight="450px">
+                                        <p:ajax event="rowSelect" update="saveFormFrais"
+                                                listener="#{gestionDePlanCommissionMB.updateFrais()}"/>
+                                        <p:column headerText="Libelle">
+                                            <h:outputText
+                                                    value="#{frais.libelle}"/>
+                                        </p:column>
+                                        <p:column headerText="Pourcentage forfaitaire" styleClass="4rem">
+                                            <h:outputText
+                                                    value="#{frais.pourcentageForfait}"/>
+                                        </p:column>
+                                        <p:column headerText="Montant forfaitaire">
+                                            <h:outputText
+                                                    value="#{frais.montantForfait}"/>
+                                        </p:column>
+                                        <p:column headerText="Type frais">
+                                            <h:outputText value="#{frais.typeFrais}"/>
+                                        </p:column>
+                                        <p:column headerText="Bénéficiaire">
+                                            <h:outputText value="#{frais.contributeurBeneficiaire.raisonSociale}"/>
+                                        </p:column>
+                                        <p:column headerText="Service">
+                                            <h:outputText value="#{frais.service.libelle}"/>
+                                        </p:column>
+                                        <p:column headerText="Actions">
+                                            <p:commandButton icon="pi pi-pencil" styleClass="rounded-button ui-button"
+                                                             update="tabViewDetail"
+                                                             action="#{gestionDePlanCommissionMB.selectionnerFraisArepartir()}">
+                                                <f:setPropertyActionListener value="#{frais}"
+                                                                             target="#{gestionDePlanCommissionMB.fraisArepartir}"/>
+                                            </p:commandButton>
+                                        </p:column>
+                                    </p:dataTable>
+                                </h:form>
+                            </div>
+                        </div>
+
+
+                        <h:form id="saveFormFrais">
+                            <h6 class="my-3 ">
+                                <i class="pi pi-info-circle"></i>
+                                Pour un nouveau plan de repartition, renseigner les informations ci-dessous
+                            </h6>
+                            <div class="ui-fluid formgrid grid">
+                                <div class="field col-12 md:col-6">
+                                    <p:outputLabel for="@next" value="Contributeur bénéficiare"/>
+                                    <p:selectOneMenu id="Contrib" required="true"
+                                                     requiredMessage="Veuillez sélectionner un contributeur"
+                                                     filter="true" converter="#{entityConverter}"
+                                                     filterMatchMode="startsWith"
+                                                     value="#{gestionDePlanCommissionMB.fraisArepartir.contributeurBeneficiaire}">
+                                        <f:selectItem itemLabel="Sélectionner un contributeur"
+                                                      itemValue="#{null}"/>
+                                        <f:selectItems value="#{gestionDePlanCommissionMB.contributeursBeneficiaire}"
+                                                       var="contrib"
+                                                       itemLabel="#{contrib.nomDirigeant}"
+                                                       itemValue="#{contrib}"/>
+                                    </p:selectOneMenu>
+                                </div>
+
+                                <div class="field col-12 md:col-6">
+                                    <p:outputLabel for="@next" value="Service du promoteur"/>
+                                    <p:selectOneMenu id="ServicesContrib" required="true"
+                                                     requiredMessage="Veuillez sélectionner un service"
+                                                     filter="true" converter="#{entityConverter}"
+                                                     filterMatchMode="startsWith"
+                                                     value="#{gestionDePlanCommissionMB.fraisArepartir.service}">
+                                        <f:selectItem itemLabel="Sélectionner un service du promoteur"
+                                                      itemValue="#{null}"/>
+                                        <f:selectItems value="#{gestionDePlanCommissionMB.services}"
+                                                       var="service"
+                                                       itemLabel="#{service.libelle}"
+                                                       itemValue="#{service}"/>
+                                    </p:selectOneMenu>
+                                </div>
+                                <div class="field col-12 md:col-6">
+                                    <p:outputLabel for="@next" value="Type de frais"/>
+                                    <p:selectOneMenu filter="true" id="TypeFrais" required="true"
+                                                     requiredMessage="Veuillez sélectionner un type de frais"
+                                                     disabled="#{gestionDePlanCommissionMB.fraisArepartir.ID != null}"
+                                                     value="#{gestionDePlanCommissionMB.fraisArepartir.typeFrais}">
+                                        <p:ajax event="change" listener="#{gestionDePlanCommissionMB.isFixe()}"
+                                                update="TypeFixeOrVariable"/>
+                                        <f:selectItem itemLabel="Sélectionnez un type de frais"
+                                                      itemValue="#{null}"/>
+                                        <f:selectItems value="#{gestionDePlanCommissionMB.typeFraisList}"
+                                                       var="typeFrais"
+                                                       itemLabel="#{typeFrais}"
+                                                       itemValue="#{typeFrais}"/>
+                                    </p:selectOneMenu>
+                                </div>
+
+                                <div class="field col-12 md:col-6">
+                                    <p:outputLabel for="@next" value="Libéllé"/>
+                                    <p:inputText value="#{gestionDePlanCommissionMB.fraisArepartir.libelle}"
+                                                 id="FormLibelle" required="true"
+                                                 requiredMessage="Veuillez renseigner le libéllé"
+                                                 placeholder="Saisir le libéllé"/>
+                                </div>
+                                <div class="field col-12 md:col-12">
+                                    <p:outputLabel for="@next" value="Description"/>
+                                    <p:inputTextarea
+                                            value="#{gestionDePlanCommissionMB.fraisArepartir.description}"
+                                            id="FormDescription" rows="3"
+                                            maxlength="255"
+                                            placeholder="Saisir une description"/>
+                                </div>
+                            </div>
+                            <div class="ui-fluid formgrid grid" jsf:id="TypeFixeOrVariable">
+                                <div class="field col-12 md:col-12 mt-2"
+                                     jsf:rendered="#{gestionDePlanCommissionMB.isFixe()}">
+                                    <h6><i class="pi pi-info-circle">
+                                    </i> Sélectionnez un type forfaitaire</h6>
+                                    <div class="flex col-12 mb-3">
+                                        <p:selectOneRadio id="TypeForf"
+                                                          disabled="#{gestionDePlanCommissionMB.fraisArepartir.ID != null}"
+                                                          value="#{gestionDePlanCommissionMB.fraisArepartir.typeForfait}">
+                                            <p:ajax event="change"
+                                                    listener="#{gestionDePlanCommissionMB.isForfaitaire()}"
+                                                    update="TypeForFormMontantForf,TypeForFormPourcentageForf"
+                                                    resetValues="true"/>
+                                            <f:selectItems
+                                                    value="#{gestionDePlanCommissionMB.typeForfaitList}"
+                                                    var="typeforf"
+                                                    itemLabel="#{typeforf}"
+                                                    itemValue="#{typeforf}"/>
+                                        </p:selectOneRadio>
+                                    </div>
+                                    <div class="ui-fluid formgrid grid">
+                                        <div class="field col-12 md:col-6" jsf:id="TypeForFormMontantForf">
+                                            <p:outputLabel for="@next" value="Montant forfaitaire"/>
+                                            <p:inputText id="FormMontantForf"
+                                                         disabled="#{!gestionDePlanCommissionMB.isForfaitaire() || gestionDePlanCommissionMB.fraisArepartir.ID != null}"
+                                                         value="#{gestionDePlanCommissionMB.fraisArepartir.montantForfait}"
+                                                         placeholder="Saisir le montant forfaitaire"/>
+                                        </div>
+                                        <div class="field col-12 md:col-6" jsf:id="TypeForFormPourcentageForf">
+                                            <p:outputLabel for="@next" value="Taux forfaitaire"/>
+                                            <p:inputText id="FormPourcentageForf"
+                                                         disabled="#{gestionDePlanCommissionMB.isForfaitaire() || gestionDePlanCommissionMB.fraisArepartir.ID != null}"
+                                                         value="#{gestionDePlanCommissionMB.fraisArepartir.pourcentageForfait}"
+                                                         placeholder="Saisir le taux forfaitaire"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex">
+                                <p:commandButton value="Ajouter" update="saveFormFrais,fraisTable"
+                                                 action="#{gestionDePlanCommissionMB.creerFraisArepartir()}"
+                                                 icon="pi pi-check" process="saveFormFrais"
+                                                 styleClass="w-auto mr-2"/>
+                                <p:commandButton value="Annuler"
+                                                 process="@this" update="saveFormFrais,fraisTable"
+                                                 action="#{gestionDePlanCommissionMB.initFraisArepartir()}"
+                                                 icon="pi pi-times"
+                                                 styleClass="w-auto"/>
+                            </div>
+
+                        </h:form>
+                    </div>
+                </div>
+            </div>
+        </p:sidebar>
+
+        <p:sidebar widgetVar="detailFraisSidebar"
+                   styleClass="w-full lg:w-6 h-full overflow-y-auto"
+                   position="right">
+            <h3 class="font-bold"> Historisation d'un plan repartition </h3>
+            <p:divider styleClass="mt-0"/>
+            <p:tabView id="tabViewDetail">
+                <p:tab title="Historisation" id="historisationFrais">
+                    <div class="grid">
+                        <div class="col-12">
+                            <h:form id="saveHisto">
+                                <div class="ui-fluid formgrid grid">
+                                    <div class="field col-12 md:col-12">
+                                        <p:outputLabel for="@next" value="Faire annotation"/>
+                                        <p:inputTextarea rows="4" maxlength="255" required="true"
+                                                         requiredMessage="Veuillez saisir un commentaire"
+                                                         value="#{gestionDePlanCommissionMB.annotation.commentaire}"
+                                                         placeholder="Saisir un commentaire..."/>
+                                    </div>
+                                    <div class="field col-12">
+                                        <div class="flex">
+                                            <p:commandButton value="Historiser"
+                                                             action="#{gestionDePlanCommissionMB.historiserFraisArepartir()}"
+                                                             update="tabViewDetail,fraisTable,saveFormFrais"
+                                                             process="@this" icon="pi pi-database"
+                                                             styleClass="w-auto mr-2">
+                                                <p:confirm header="Attention!"
+                                                           message="Voulez-vous vraiment historiser ce frais de service ?"
+                                                           icon="pi pi-info-circle"/>
+                                            </p:commandButton>
+                                            <p:commandButton value="Annuler" update="fraisTable,saveFormFrais"
+                                                             action="#{gestionDePlanCommissionMB.annulerHistorisation()}"
+                                                             process="@this" icon="pi pi-times"
+                                                             styleClass="w-auto"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </h:form>
+
+                        </div>
+                    </div>
+                </p:tab>
+                <p:tab title="Intervalle frais à répartir" id="intervalleFrais"
+                       disabled="#{gestionDePlanCommissionMB.fraisArepartir.ID == null || gestionDePlanCommissionMB.fraisArepartir.typeFrais == 'FIXE'}">
+                    <div class="grid">
+                        <div class="col-12 overflow-x-hidden">
+                            <div class="card">
+                                <div class="ui-fluid formgrid grid">
+                                    <h:form id="intervalleTable">
+                                        <div class="col-12 mb-4">
+                                            <h5>Intervalle de frais</h5>
+                                            <h6 class="my-3 "><i class="pi pi-info-circle"></i>
+                                                Liste des intervalles de frais à repartir (#{gestionDePlanCommissionMB.intervalleFraisArepartirsList.size()})
+                                            </h6>
+                                            <p:dataTable widgetVar="idIntervalleTable"
+                                                         var="interval"
+                                                         value="#{gestionDePlanCommissionMB.intervalleFraisArepartirsList}"
+                                                         selection="#{gestionDePlanCommissionMB.intervalleFraisArepartir}"
+                                                         lazy="false"
+                                                         reflow="true"
+                                                         emptyMessage="Pas de données"
+                                                         rowKey="#{interval.id}"
+                                                         selectionMode="single"
+                                                         scrollable="true"
+                                                         scrollHeight="450px">
+                                                <p:ajax event="rowSelect"
+                                                        update="tabViewDetail:saveIntervalleForm"
+                                                        listener="#{gestionDePlanCommissionMB.updateIntervalle()}"/>
+                                                <p:column headerText="Montant minimum">
+                                                    <h:outputText
+                                                            value="#{interval.montantMin}"/>
+                                                </p:column>
+                                                <p:column headerText="Montant maximum">
+                                                    <h:outputText
+                                                            value="#{interval.montantMax}"/>
+                                                </p:column>
+                                                <p:column headerText="Montant forfaitaire">
+                                                    <h:outputText
+                                                            value="#{interval.montantForfait}"/>
+                                                </p:column>
+                                                <p:column headerText="Type forfait">
+                                                    <h:outputText value="#{interval.typeForfait}"/>
+                                                </p:column>
+                                            </p:dataTable>
+                                        </div>
+                                    </h:form>
+
+                                    <h:form id="saveIntervalleForm">
+                                        <h6 class="my-3 ">
+                                            <i class="pi pi-info-circle"></i>
+                                            Pour un nouvel intervalle, renseigner les informations ci-dessous
+                                        </h6>
+                                        <div class="ui-fluid formgrid grid">
+                                            <div class="field col-12 md:col-6">
+                                                <p:outputLabel for="@next" value="Montant minimum"/>
+                                                <p:inputText
+                                                        disabled="#{gestionDePlanCommissionMB.intervalleFraisArepartir.id != null}"
+                                                        value="#{gestionDePlanCommissionMB.intervalleFraisArepartir.montantMin}"
+                                                        placeholder="Saisir le montant minimum"/>
+                                            </div>
+                                            <div class="field col-12 md:col-6">
+                                                <p:outputLabel for="@next" value="Montant maximum"/>
+                                                <p:inputText
+                                                        disabled="#{gestionDePlanCommissionMB.intervalleFraisArepartir.id != null}"
+                                                        value="#{gestionDePlanCommissionMB.intervalleFraisArepartir.montantMax}"
+                                                        placeholder="Saisir le montant maximum"/>
+                                            </div>
+                                            <div class="field col-12 mt-2 mb-3">
+                                                <h6><i class="pi pi-info-circle"></i>
+                                                    Sélectionnez un type forfaitaire
+                                                </h6>
+                                                <p:selectOneRadio
+                                                        disabled="#{gestionDePlanCommissionMB.intervalleFraisArepartir.id != null}"
+                                                        value="#{gestionDePlanCommissionMB.intervalleFraisArepartir.typeForfait}">
+                                                    <p:ajax event="change"
+                                                            listener="#{gestionDePlanCommissionMB.isIntervalleForfaitaire()}"
+                                                            update="montantForf,tauxForf"
+                                                            resetValues="true"/>
+                                                    <f:selectItems
+                                                            value="#{gestionDePlanCommissionMB.typeForfaitList}"
+                                                            var="typeforf"
+                                                            itemLabel="#{typeforf}"
+                                                            itemValue="#{typeforf}"/>
+                                                </p:selectOneRadio>
+                                            </div>
+                                        </div>
+                                        <div class="ui-fluid formgrid grid">
+                                            <div class="field col-12 md:col-6" jsf:id="montantForf">
+                                                <p:outputLabel for="@next" value="Montant forfaitaire"/>
+                                                <p:inputText
+                                                        disabled="#{!gestionDePlanCommissionMB.isIntervalleForfaitaire() || gestionDePlanCommissionMB.intervalleFraisArepartir.id != null}"
+                                                        value="#{gestionDePlanCommissionMB.intervalleFraisArepartir.montantForfait}"
+                                                        placeholder="Saisir le montant forfaitaire"/>
+                                            </div>
+                                            <div class="field col-12 md:col-6" jsf:id="tauxForf">
+                                                <p:outputLabel for="@next" value="Taux forfaitaire"/>
+                                                <p:inputText
+                                                        disabled="#{gestionDePlanCommissionMB.isIntervalleForfaitaire() || gestionDePlanCommissionMB.intervalleFraisArepartir.id != null}"
+                                                        value="#{gestionDePlanCommissionMB.intervalleFraisArepartir.pourcentageForfait}"
+                                                        placeholder="Saisir le taux forfaitaire"/>
+                                            </div>
+                                        </div>
+
+                                        <div class="field col-10">
+                                            <div class="flex">
+                                                <p:commandButton value="Ajouter"
+                                                                 update="tabViewDetail:intervalleTable"
+                                                                 action="#{gestionDePlanCommissionMB.saveIntervalle()}"
+                                                                 disabled="#{gestionDePlanCommissionMB.intervalleFraisArepartir.id != null}"
+                                                                 icon="pi pi-check"
+                                                                 styleClass="w-auto mr-2"
+                                                />
+                                                <p:commandButton value="Supprimer" icon="pi pi-trash"
+                                                                 update="tabViewDetail:intervalleTable,saveIntervalleForm"
+                                                                 styleClass="w-auto mr-2"
+                                                                 action="#{gestionDePlanCommissionMB.supprimerIntervalle()}"
+                                                                 disabled="#{gestionDePlanCommissionMB.intervalleFraisArepartir.id == null}"/>
+                                                <p:commandButton value="Annuler"
+                                                                 update="tabViewDetail:intervalleTable,saveIntervalleForm"
+                                                                 action="#{gestionDePlanCommissionMB.annulerIntervalle()}"
+                                                                 process="@this"
+                                                                 icon="pi pi-times"
+                                                                 styleClass="w-auto"/>
+                                            </div>
+                                        </div>
+                                    </h:form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </p:tab>
+            </p:tabView>
+
+        </p:sidebar>
+
+
+    </ui:define>
+</ui:composition>
+

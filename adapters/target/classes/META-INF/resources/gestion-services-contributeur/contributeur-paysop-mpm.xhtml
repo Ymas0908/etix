@@ -1,0 +1,296 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui" xmlns:f="http://xmlns.jcp.org/jsf/core"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="title">Gestion des services d'un contributeur</ui:define>
+    <ui:define name="viewname">
+        <li>GESTION DES SERVIES D'UN CONTRIBUTEUR</li>
+        <li><i class="pi pi-chevron-right"></i></li>
+        <li><p:link
+                outcome="/gestion-services-contributeur/contributeur-paysop-mpm.xhtml">EDIITON DE SERVICES </p:link>
+        </li>
+    </ui:define>
+
+    <ui:define name="content">
+        <div class="grid">
+            <div class="col-12">
+                <div class="card">
+                    <h:form id="formcontrib">
+                        <div class="grid">
+                            <div class="col-12">
+                                <h3 class="font-bold mb-4">Edition de services</h3>
+                            </div>
+                        </div>
+                    </h:form>
+                    <h:form id="tablecontrib">
+                        <div class="flex mt-3 mb-2">
+                            <div class="flex-1 flex flex-column">
+                                <h5 class="my-3">Liste des contributeurs (#{creationDePlanTarifaireDeServiceMB.contributeurs.size()})</h5>
+                                <h6 class="mb-2">
+                                    <i class="pi pi-info-circle"></i> Sélectionner un contributeur dans la liste
+                                </h6>
+                            </div>
+
+                        </div>
+                        <div class="grid">
+                            <div class="col-12">
+                                <p:dataTable id="contributeur"
+                                             scrollable="true"
+                                             scrollHeight="250"
+                                             reflow="true"
+                                             styleClass="products-table"
+                                             lazy="false"
+                                             var="contrib" value="#{gestionServiceContributeurMB.contributeurs}"
+                                             emptyMessage="Aucun contributeur disponible"
+                                             rowKey="#{contrib.ID}"
+                                             selection="#{gestionServiceContributeurMB.contributeur}"
+                                             selectionMode="single">
+                                    <p:ajax event="rowSelect"
+                                            listener="#{gestionServiceContributeurMB.selectContributeur()}"
+                                            update="minimarketplace"/>
+                                    <p:column headerText="Code social" filterBy="#{contrib.identifiantSocial}">
+                                        <h:outputText value="#{contrib.identifiantSocial}"/>
+                                    </p:column>
+                                    <p:column headerText="Raison sociale" filterBy="#{contrib.raisonSociale}">
+                                        <h:outputText value="#{contrib.raisonSociale}"/>
+                                    </p:column>
+
+                                    <p:column headerText="Nom du dirigeant" filterBy="#{contrib.nomDirigeant}">
+                                        <h:outputText value="#{contrib.nomDirigeant}"/>
+                                    </p:column>
+                                    <p:column headerText="Identifiant GIMpay" filterBy="#{contrib.identifiantFiscal}">
+                                        <h:outputText value="#{contrib.identifiantFiscal}"/>
+                                    </p:column>
+                                    <p:column headerText="Type du contributeur"
+                                              filterBy="#{contrib.typeContributeur.toString()}">
+                                        <h:outputText value="#{contrib.typeContributeur.toString()}"/>
+                                    </p:column>
+
+                                </p:dataTable>
+                            </div>
+                        </div>
+                    </h:form>
+                </div>
+            </div>
+        </div>
+        <div class="grid mt-1">
+            <div class="col-12">
+                <h:form id="minimarketplace">
+                    <div class="card">
+                        <div class="flex mt-2 mb-2">
+                            <div class="flex-1 flex flex-column">
+                                <h5>Liste des mini-places de marché (#{gestionServiceContributeurMB.mmps.size()})</h5>
+                                <h6 class="mb-2">
+                                    <i class="pi pi-info-circle"></i> Sélectionner une mini-place de marché dans la liste
+                                </h6>
+                            </div>
+                        </div>
+                        <div class="grid">
+                            <div class="col-12">
+                                <p:dataTable id="minimarketplace"
+                                             scrollable="true"
+                                             scrollHeight="200"
+                                             reflow="true"
+                                             styleClass="products-table"
+                                             lazy="false"
+                                             var="mmp" value="#{gestionServiceContributeurMB.mmps}"
+                                             emptyMessage="Aucun contributeur disponible"
+                                             rowKey="#{mmp.id}">
+                                    <p:column headerText="Logo" width="5em">
+                                        <p:avatar styleClass="mr-2" size="large" shape="circle">
+                                            <p:graphicImage
+                                                    value="#{'/resources/poseidon-layout/images/marketing.svg'}"/>
+                                        </p:avatar>
+                                    </p:column>
+                                    <p:column headerText="Libelle">
+                                        <h:outputText value="#{mmp.libelle}"/>
+                                    </p:column>
+
+                                    <p:column headerText="Statut" width="9em">
+                                        <h:outputText value="#{mmp.statutMmp}"/>
+                                    </p:column>
+                                    <p:column headerText="Action" width="3em">
+                                        <p:commandButton
+                                                icon="pi pi-arrow-circle-right"
+                                                class="ui-button"
+                                                title="Gérer les services"
+                                                action="#{gestionServiceContributeurMB.showServiceContributeur()}"
+                                                update="minimarketplace,serviceForm,serviceTableForm"
+                                                styleClass="edit-button rounded-button ui-button mr-2">
+                                            <f:setPropertyActionListener value="#{mmp}"
+                                                                         target="#{gestionServiceContributeurMB.mmp}"/>
+                                        </p:commandButton>
+                                    </p:column>
+                                </p:dataTable>
+                            </div>
+                        </div>
+                    </div>
+                </h:form>
+            </div>
+        </div>
+        <p:sidebar id="serviceSidebar" widgetVar="updateServiceSidebar"
+                   styleClass="w-full lg:w-6 h-full overflow-y-auto" position="right">
+            <h3 class="font-bold mb-4">Edition des services d'un contributeur</h3>
+            <p:divider styleClass="mt-0"/>
+            <div class="grid">
+                <div class="card">
+                    <h:form id="serviceTableForm">
+                        <div class="grid">
+                            <div class="col-12">
+                                <div class="grid">
+                                    <div class="col-12">
+                                        <h6 class="my-3 "><i class="pi pi-info-circle"></i>
+                                            Liste des services (#{gestionServiceContributeurMB.servicesContrib.size()})
+                                        </h6>
+                                        <p:dataTable widgetVar="serviceTable"
+                                                     scrollable="true"
+                                                     scrollHeight="500"
+                                                     lazy="false" reflow="true"
+                                                     selection="#{gestionServiceContributeurMB.serviceContrib}"
+                                                     selectionMode="single"
+                                                     var="service"
+                                                     value="#{gestionServiceContributeurMB.servicesContrib}"
+                                                     emptyMessage="Aucuns services disponible"
+                                                     rowKey="#{service.ID}">
+                                            <p:ajax event="rowSelect"
+                                                    update="serviceTableForm,serviceForm,activateServiceSidebarForm"
+                                                    process="@this"/>
+                                            <p:column headerText="Libelle du service">
+                                                <h:outputText value="#{service.libelle}"/>
+                                            </p:column>
+                                            <p:column headerText="Service-type">
+                                                <h:outputText value="#{service.serviceType.libelle}"/>
+                                            </p:column>
+                                            <p:column headerText="Statut du service">
+                                                <h:outputText value="#{service.statutService}"/>
+                                            </p:column>
+                                            <p:column headerText="Actions" width="10em">
+                                                <p:commandButton class="ui-button"
+                                                                 icon="pi pi-lock"
+                                                                 update="activateServiceSidebarForm"
+                                                                 title="Activer/Desactiver le service"
+                                                                 action="#{gestionServiceContributeurMB.showServiceActivate()}"
+                                                                 styleClass="edit-button rounded-button ui-button mr-2 ">
+                                                    <f:setPropertyActionListener value="#{service}"
+                                                                                 target="#{gestionServiceContributeurMB.serviceContrib}"/>
+                                                </p:commandButton>
+                                                <p:commandButton
+                                                        action="#{gestionServiceContributeurMB.retirerUnServiceaUnContributeur()}"
+                                                        update="serviceTableForm"
+                                                        icon="pi pi-trash"
+                                                        class="ui-button"
+                                                        title="Retirer le service"
+                                                        styleClass="edit-button rounded-button ui-button "
+                                                        process="@this">
+                                                    <f:setPropertyActionListener value="#{service}"
+                                                                                 target="#{gestionServiceContributeurMB.serviceContrib}"/>
+                                                    <p:confirm header="Confirmation"
+                                                               message="Voulez-vous retirer ce service ?"
+                                                               icon="pi pi-exclamation-triangle"/>
+                                                </p:commandButton>
+                                            </p:column>
+                                        </p:dataTable>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </h:form>
+                    <p:spacer height="20"/>
+                    <h:form id="serviceForm">
+                        <div class="col overflow-x-hidden">
+                            <h6 class="my-3 "><i
+                                    class="pi pi-info-circle"></i> Pour un nouveau service, renseigner les informations ci-dessous
+                            </h6>
+                            <div class="ui-fluid formgrid grid">
+                                <div class="field col-12 md:col-6">
+                                    <p:outputLabel for="@next" value="Libelle du service"/>
+                                    <p:inputText id="contribRs" placeholder="Libellé" required="true"
+                                                 requiredMessage="Veuillez saisir un libellé"
+                                                 value="#{gestionServiceContributeurMB.serviceContrib.libelle}"/>
+                                </div>
+                                <div class="field col-12 md:col-6">
+                                    <p:outputLabel for="@next" value="Service-type"/>
+                                    <p:selectOneMenu id="contribEmetAgree" converter="#{entityConverter}"
+                                                     required="true" requiredMessage="Veuillez choisir un service-type"
+                                                     value="#{gestionServiceContributeurMB.serviceContrib.serviceType}">
+                                        <f:selectItem itemLabel=" --- Veuillez sélectionner un service type ---"
+                                                      itemValue="#{null}" itemDisabled="true"/>
+                                        <f:selectItems value="#{gestionServiceContributeurMB.serviceTypes}"
+                                                       var="type"
+                                                       itemLabel="#{type.libelle}"
+                                                       itemValue="#{type}"/>
+                                    </p:selectOneMenu>
+                                </div>
+                                <div class="field col-12">
+                                    <p:outputLabel for="@next" value="Description"/>
+                                    <p:inputTextarea rows="5" maxlength="255" placeholder="Description"
+                                                     value="#{gestionServiceContributeurMB.serviceContrib.description}"/>
+                                </div>
+                                <div class="field col-12 md:mt-2">
+                                    <span class="p-float-label"><i class="pi pi-info-circle"></i> Veuillez sélectionner les pays d'opérations liés à ce service</span>
+                                    <p:selectManyCheckbox id="grid2"
+                                                          value="#{gestionServiceContributeurMB.serviceContrib.listPaysOperation}"
+                                                          layout="responsive"
+                                                          columns="3">
+                                        <f:selectItems value="#{gestionServiceContributeurMB.paysOperations}" var="pays"
+                                                       itemLabel="#{pays.nom}"
+                                                       itemValue="#{pays}"/>
+                                    </p:selectManyCheckbox>
+                                </div>
+
+                            </div>
+                            <div class="ui-fluid formgrid grid">
+                                <p:commandButton value="Enregistrer" update="serviceTableForm,serviceForm"
+                                                 action="#{gestionServiceContributeurMB.ajouterUnServicePourUnContributeur()}"
+                                                 process="serviceForm" icon="pi pi-save" styleClass="w-auto mr-2"/>
+                                <p:commandButton value="Annuler" update="serviceTableForm,serviceForm"
+                                                 action="#{gestionServiceContributeurMB.annulerService()}"
+                                                 process="@this" icon="pi  pi-times"
+                                                 styleClass="w-auto "/>
+                            </div>
+                        </div>
+                    </h:form>
+                </div>
+            </div>
+        </p:sidebar>
+        <p:sidebar id="activeServiceSidebar" widgetVar="activateServiceSidebar"
+                   styleClass="w-full lg:w-6 h-full overflow-y-auto" position="right">
+            <h4 class="font-bold ">Activation / Désactivation d'un service </h4>
+            <p:divider styleClass="mt-0"/>
+            <h:form id="activateServiceSidebarForm">
+                <div class="grid">
+                    <div class="col-12">
+                        <div class="ui-fluid formgrid grid">
+                            <div class="field col-12 md:col-12">
+                                <p:outputLabel value="Faire une annotation"/>
+                                <p:inputTextarea id="activateServiceSideAnnotation"
+                                                 required="true" requiredMessage="Veuillez faire un commentaire"
+                                                 value="#{gestionServiceContributeurMB.annotation.commentaire}"
+                                                 placeholder="Saisir un commentaire..." rows="5"
+                                                 maxlength="255"/>
+                            </div>
+                            <div class="field col-12">
+                                <div class="flex">
+                                    <p:commandButton value="Activer"
+                                                     disabled="#{gestionServiceContributeurMB.serviceContrib.statutService == 'ACTIF'}"
+                                                     action="#{gestionServiceContributeurMB.activateService()}"
+                                                     update="serviceTableForm,activateServiceSidebarForm"
+                                                     process="@this"
+                                                     icon="pi pi-save" styleClass="w-auto mr-2"/>
+                                    <p:commandButton value="Désactiver"
+                                                     disabled="#{gestionServiceContributeurMB.serviceContrib.statutService == 'INACTIF'}"
+                                                     update="serviceTableForm,activateServiceSidebarForm"
+                                                     action="#{gestionServiceContributeurMB.desactivateService()}"
+                                                     process="@this"
+                                                     icon="pi pi-save" styleClass="w-auto"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </h:form>
+        </p:sidebar>
+    </ui:define>
+</ui:composition>

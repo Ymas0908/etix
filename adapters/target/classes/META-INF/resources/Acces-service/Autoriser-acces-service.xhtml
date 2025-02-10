@@ -1,0 +1,192 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="viewname">
+        <li>GESTION DES AUTORISATIONS</li>
+        <li><i class="pi pi-chevron-right"></i></li>
+        <li>
+            <p:link outcome="/Acces-service/Autoriser-acces-service">
+                AUTORISATION DES CONTRIBUTEURS AUX SERVICES
+            </p:link>
+        </li>
+    </ui:define>
+
+    <ui:define name="content">
+        <div class="grid">
+            <h:form id="listContributeurPromoteurForm">
+                <div class="card mb-0">
+                    <div class="grid">
+                        <div class="col-12">
+                            <h3 class="font-bold mb-4">Autorisation d'un accès à un service</h3>
+                            <h6 class="mb-2">
+                                <i class="pi pi-info-circle"></i> Saisir les critères de recherche
+                            </h6>
+                            <div class="ui-fluid formgrid grid">
+                                <div class="field col-12 md:col-4">
+                                    <p:inputText id="contribRais" placeholder="Raison sociale"
+                                                 value="#{autorisationAccesAunServiceMB.raisonSociale}"/>
+                                </div>
+                                <div class="field col-6 md:col-3 flex">
+                                    <p:commandButton value="Rechercher"
+                                                     update="listContributeurPromoteurForm"
+                                                     action="#{autorisationAccesAunServiceMB.collecterLesContributeursByRaisonSociale()}"
+                                                     icon="pi pi-search" styleClass="w-auto"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid">
+                        <div class="flex mt-5 mb-2">
+                            <div class="flex-1 flex flex-column">
+                                <h5>Liste des contributeurs promoteurs (#{autorisationAccesAunServiceMB.contributeursPromoteurs.size()})</h5>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <p:dataTable id="contribsPromoteurTable" var="contribPromoteur"
+                                         value="#{autorisationAccesAunServiceMB.contributeursPromoteurs}"
+                                         reflow="true" scrollable="true" scrollHeight="400"
+                                         styleClass="contrib-table" emptyMessage="Aucun contributeur disponible"
+                                         selection="#{autorisationAccesAunServiceMB.contributeur}"
+                                         rowKey="#{contribPromoteur.ID}" selectMode="single">
+                                <p:ajax event="rowSelect" update="listServiceForm"
+                                        listener="#{autorisationAccesAunServiceMB.collecterLesServicesParContributeur()}"/>
+                                <p:column headerText="Raison sociale">
+                                    <h:outputText value="#{contribPromoteur.raisonSociale}"/>
+                                </p:column>
+                                <p:column headerText="Contact téléphonique">
+                                    <h:outputText value="#{contribPromoteur.contactTelephonique}"/>
+                                </p:column>
+                                <p:column headerText="Nom du dirigeant">
+                                    <h:outputText value="#{contribPromoteur.nomDirigeant}"/>
+                                </p:column>
+                                <p:column headerText="Identifiant GIMpayt">
+                                    <h:outputText value="#{contribPromoteur.identifiantSocial}"/>
+                                </p:column>
+                                <p:column headerText="Type de contributeur">
+                                    <h:outputText value="#{contribPromoteur.typeContributeur.toString()}"/>
+                                </p:column>
+                            </p:dataTable>
+                        </div>
+                    </div>
+                </div>
+            </h:form>
+            <br/>
+
+
+            <!-- formulaire de service -->
+            <h:form id="listServiceForm">
+                <div class="card">
+                    <div class="flex">
+                        <div class="flex-1 flex flex-column">
+                            <h5>Liste des services offerts disponibles (#{autorisationAccesAunServiceMB.services.size()}) </h5>
+                        </div>
+                    </div>
+
+                    <div class="grid">
+                        <div class="col-12">
+                            <p:dataTable id="servicesTable" var="service"
+                                         value="#{autorisationAccesAunServiceMB.services}"
+                                         reflow="true" scrollable="true" scrollHeight="400"
+                                         styleClass="contrib-table" emptyMessage="Aucun service disponible"
+                                         selection="#{autorisationAccesAunServiceMB.service}"
+                                         rowKey="#{service.ID}" selectMode="single">
+                                <p:ajax event="rowSelect"
+                                        update="listContributeurNonAutoriseForm, listContributeurAutoriseForm"
+                                        listener="#{autorisationAccesAunServiceMB.collecterLesContributeursAutorisesEtNonAutorises()}"/>
+                                <p:column headerText="libelle">
+                                    <h:outputText value="#{service.libelle}"/>
+                                </p:column>
+                                <p:column headerText="satut du service">
+                                    <h:outputText value="#{service.statutService}"/>
+                                </p:column>
+                            </p:dataTable>
+                        </div>
+                    </div>
+                </div>
+            </h:form>
+            <!-- formulaire de service -->
+
+            <div class="grid mt-1">
+                <div class="col-12 xl:col-6">
+                    <h:form id="listContributeurNonAutoriseForm">
+                        <div class="card">
+                            <h5>Liste des contributeurs à autoriser (#{autorisationAccesAunServiceMB.contributeursNonAutorises.size()})</h5>
+                            <p:divider/>
+
+
+                            <p:dataTable id="contributeurNonAutoriseTable" var="contribNonAutoriser"
+                                         value="#{autorisationAccesAunServiceMB.contributeursNonAutorises}"
+                                         reflow="true" rowKey="#{contribNonAutoriser.ID}" scrollable="true"
+                                         style="margin-bottom:0; height: 250px"
+                                         scrollHeight="200px"
+                                         emptyMessage="Aucun contributeurs disponible."
+                                         selection="#{autorisationAccesAunServiceMB.contributeursAAutoriser}"
+                                         styleClass="contrib-table">
+                                <p:column selectionMode="multiple"
+                                          style="width:16px;text-align:center"/>
+                                <p:column headerText="Raison sociale">
+                                    <h:outputText value="#{contribNonAutoriser.raisonSociale}"/>
+                                </p:column>
+                                <p:column headerText="Nom du dirigeant">
+                                    <h:outputText value="#{contribNonAutoriser.nomDirigeant}"/>
+                                </p:column>
+                                <p:column headerText="Contact téléphonique">
+                                    <h:outputText value="#{contribNonAutoriser.mobileDirigeant}"/>
+                                </p:column>
+                            </p:dataTable>
+                            <div class="flex justify-content-left flex-wrap mt-2">
+                                <p:commandButton value="Autoriser" style="width: 100px; margin-top: 5%"
+                                                 action="#{autorisationAccesAunServiceMB.rattacherUnServiceSelectionneAuxContributeursAautoriser()}"
+                                                 update="listContributeurNonAutoriseForm, listContributeurAutoriseForm"
+                                                 icon="pi pi-check"
+                                                 styleClass="w-auto"/>
+                            </div>
+                        </div>
+                    </h:form>
+                </div>
+
+
+                <div class="col-12 xl:col-6">
+                    <h:form id="listContributeurAutoriseForm">
+                        <div class="card">
+                            <h5>Liste des contributeurs autorisés (#{autorisationAccesAunServiceMB.contributeursAutorises.size()})</h5>
+                            <p:divider/>
+
+                            <p:dataTable id="contribAutoriseTable" var="contribAutorise"
+                                         value="#{autorisationAccesAunServiceMB.contributeursAutorises}"
+                                         selection="#{autorisationAccesAunServiceMB.contributeursARetirer}"
+                                         reflow="true" rowKey="#{contribAutorise.ID}" scrollable="true"
+                                         emptyMessage="Aucun contributeur disponible."
+                                         styleClass="contrib-table"
+                                         scrollHeight="200px"
+                                         style="margin-bottom:0; height: 250px">
+                                <p:column selectionMode="multiple"
+                                          style="width:16px;text-align:center"/>
+                                <p:column headerText="Raison sociale">
+                                    <h:outputText value="#{contribAutorise.raisonSociale}"/>
+                                </p:column>
+                                <p:column headerText="Nom du dirigeant">
+                                    <h:outputText value="#{contribAutorise.nomDirigeant}"/>
+                                </p:column>
+                                <p:column headerText="Contact téléphonique">
+                                    <h:outputText value="#{contribAutorise.mobileDirigeant}"/>
+                                </p:column>
+                            </p:dataTable>
+                            <div class="flex justify-content-left flex-wrap mt-2">
+                                <p:commandButton value="Rétirer" style="width: 100px; margin-top: 5%"
+                                                 action="#{autorisationAccesAunServiceMB.retirerUnServiceAuxContributeursAutorises()}"
+                                                 update="listContributeurNonAutoriseForm, listContributeurAutoriseForm"
+                                                 icon="pi pi-times" styleClass="w-auto">
+                                </p:commandButton>
+                            </div>
+                        </div>
+                    </h:form>
+                </div>
+            </div>
+        </div>
+    </ui:define>
+</ui:composition>

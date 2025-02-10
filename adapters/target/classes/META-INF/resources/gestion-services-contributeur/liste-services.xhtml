@@ -1,0 +1,313 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
+
+    <ui:define name="title">Gestion des services d'un contributeur</ui:define>
+    <ui:define name="viewname">
+        <li>GESTION DES SERVICES D'UN CONTRIBUTEUR</li>
+        <li><i class="pi pi-chevron-right"></i></li>
+        <li><p:link
+                outcome="/gestion-services-contributeur/liste-services.xhtml">SERVICES</p:link>
+        </li>
+    </ui:define>
+
+    <ui:define name="content">
+        <h:form id="serviceTableForm">
+            <div class="grid">
+                <div class="col">
+                    <div class="card">
+                        <div class="grid">
+                            <div class="col-12">
+                                <h3 class="font-bold mb-4">Edition des services d'un contributeur</h3>
+                                <h6 class="mb-3"><i class="pi pi-info-circle"> </i> Saisir le libellé d'un service</h6>
+                                <div class="ui-fluid formgrid grid ">
+                                    <div class="field col-12 md:col-3">
+                                        <p:inputText id="servicelib" placeholder="Libelle du service"/>
+                                    </div>
+                                    <div class="field col-12 md:col-3 flex">
+                                        <p:commandButton type="button" value="Rechercher" icon="pi pi-search"
+                                                         styleClass="lg:w-auto"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex mt-3 mb-2">
+                            <div class="flex-1 flex flex-column">
+                                <h5>Liste des services (#{gestionServiceContributeurMB.servicesContrib.size()})</h5>
+                            </div>
+                            <div class="flex align-items-center justify-content-center">
+                                <p:linkButton value="Ajouter un service"
+                                              styleClass="w-auto"
+                                              process="@this" icon="pi pi-plus"
+                                              outcome="/gestion-services-contributeur/contributeur-paysop-mpm"/>
+                            </div>
+                        </div>
+                        <div class="grid">
+                            <div class="col-12">
+                                <p:dataTable widgetVar="serviceTable"
+                                             scrollable="true"
+                                             scrollHeight="500"
+                                             lazy="false" reflow="true"
+                                             var="service" value="#{gestionServiceContributeurMB.servicesContrib}"
+                                             emptyMessage="Aucuns services disponible"
+                                             rowKey="#{service.id}">
+                                    <p:column headerText="Libelle du service">
+                                        <h:outputText value="#{service.libelle}"/>
+                                    </p:column>
+                                    <p:column headerText="Description du service">
+                                        <h:outputText value="#{service.description}"/>
+                                    </p:column>
+                                    <p:column headerText="Libelle du service-type">
+                                        <h:outputText value="#{service.serviceType.libelle}"/>
+                                    </p:column>
+                                    <p:column headerText="Statut du service">
+                                        <h:outputText value="#{service.statutService}"/>
+                                    </p:column>
+                                    <p:column headerText="Actions" width="10em">
+                                        <p:commandButton icon="pi pi-pencil"
+                                                         action="#{gestionServiceContributeurMB.showService()}"
+                                                         update="serviceTableForm,tabViewServiceWeb:serviceWebTableForm,tabViewServiceWeb:serviceWebCreateForm"
+                                                         title="Modifier un type de service"
+                                                         styleClass="edit-button rounded-button ui-button mx-1">
+                                            <f:setPropertyActionListener value="#{service}"
+                                                                         target="#{gestionServiceContributeurMB.serviceContrib}"
+                                            />
+                                        </p:commandButton>
+                                        <p:commandButton
+                                                icon="pi pi-lock"
+                                                styleClass="ui-button rounded-button mr-2"
+                                                Title="Activer ou desactiver un service"
+                                                onclick="PF('activeSidebar').show()"
+                                                process="@this">
+                                        </p:commandButton>
+                                        <p:commandButton
+                                                icon="pi pi-trash"
+                                                class="ui-button"
+                                                title="Retirer le service"
+                                                styleClass="edit-button rounded-button ui-button "
+                                                process="@this">
+                                        </p:commandButton>
+                                    </p:column>
+                                </p:dataTable>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </h:form>
+        <p:sidebar widgetVar="updateServiceSidebar" styleClass="w-full lg:w-6 h-full overflow-y-auto" position="right"
+                   modal="true">
+            <h4 class="font-bold ">Edition d'un service </h4>
+            <p:divider styleClass="mb-2"/>
+            <p:tabView dynamic="true" cache="true" id="tabViewServiceWeb">
+                <p:tab title="Service">
+                    <h:form id="UpdateServiceSidbarForm">
+                        <div class="grid">
+                            <div class="col overflow-x-hidden">
+                                <h6 class="my-3 "><i
+                                        class="pi pi-info-circle"></i> Saisir les informations du service
+                                </h6>
+                                <div class="ui-fluid formgrid grid">
+                                    <div class="field col-12 md:col-6">
+                                        <p:outputLabel for="@next" value="Libelle du service"/>
+                                        <p:inputText id="serviceUpdateSideLibelle" placeholder="Libellé"
+                                                     value="#{gestionServiceContributeurMB.serviceContrib.libelle}"/>
+                                    </div>
+
+                                    <div class="field col-12 md:col-6">
+                                        <p:outputLabel for="@next" value="Service-type"/>
+                                        <p:selectOneMenu id="contribEmetAgree" filter="true"
+                                                         filterMatchMode="startsWith" filterNormalize="true">
+                                            <f:selectItem itemLabel="Sélectionner un service-type"
+                                                          itemValue="#{null}"/>
+                                            <f:selectItem itemLabel="éméteur 1" itemValue="emeteur1"/>
+                                            <f:selectItem itemLabel="éméteur 2" itemValue="emeteur2"/>
+                                            <f:selectItem itemLabel="éméteur 3" itemValue="emeteur3"/>
+                                        </p:selectOneMenu>
+                                    </div>
+                                    <div class="field col-12">
+                                        <p:outputLabel for="@next" value="Description"/>
+                                        <p:inputTextarea id="serviceUpdateSideDescription" rows="5" maxlength="255"
+                                                         placeholder="Description"
+                                                         value="#{gestionServiceContributeurMB.serviceContrib.description}"/>
+                                    </div>
+
+                                </div>
+                                <div class="ui-fluid formgrid grid">
+                                    <p:commandButton value="Enregistrer"
+                                                     update="UpdateServiceSidbarForm,serviceTableForm"
+                                                     action="#{gestionServiceContributeurMB.modifierUnServicePourUnContributeur()}"
+                                                     process="@this" icon="pi pi-save" styleClass="w-auto mr-2"/>
+                                    <p:commandButton value="Annuler"
+                                                     update="tabViewServiceWeb:UpdateServiceSidbarForm,serviceTableForm"
+                                                     action="#{gestionServiceContributeurMB.annulerEditionService()}"
+                                                     process="@this" icon="pi  pi-times"
+                                                     styleClass="w-auto "/>
+                                </div>
+                            </div>
+                        </div>
+                    </h:form>
+                </p:tab>
+                <p:tab title="Services web rattachés">
+                    <h:form id="serviceWebTableForm">
+                        <div class="grid">
+                            <h5 class=" mb-2">Liste des services web rattachés au service </h5>
+                            <div class="col-12">
+                                <p:dataTable id="serviceweb" widgetVar="movements"
+                                             var="servweb" value="#{gestionServiceContributeurMB.serviceWebs}"
+                                             styleClass="products-table" emptyMessage="Pas de données"
+                                             rowKey="#{gestionServiceContributeurMB.serviceWeb}" scrollable="true"
+                                             scrollHeight="200px"
+                                             lazy="false" reflow="true"
+                                             selectionMode="single">
+                                    <p:column headerText="Libellé du service web"
+                                              filterBy="#{servweb.libelle}">
+                                        <h:outputText value="#{servweb.libelle}"/>
+                                    </p:column>
+                                    <p:column headerText="Description du service web">
+                                        <h:outputText value="#{servweb.description}"/>
+                                    </p:column>
+                                    <p:column headerText="Type de service web"
+                                              filterMatchMode="contains" filterable="true"
+                                              filterBy="#{servweb.typeServiceWeb}">
+                                        <h:outputText value="#{servweb.typeServiceWeb}"/>
+                                        <f:facet name="filter">
+                                            <p:selectOneMenu onchange="PF('movements').filter()"
+                                                             styleClass="ui-custom-filter">
+                                                <f:selectItem itemLabel="-- TOUS LES TYPES --"
+                                                              itemValue="#{null}"/>
+                                                <f:selectItem itemLabel="REST" itemValue="rest"/>
+                                                <f:selectItem itemLabel="SOAP" itemValue="soap"/>
+                                                <f:selectItem itemLabel="RPC" itemValue="rpc"/>
+                                                <f:selectItem itemLabel="WEB SOCKET" itemValue="websocket"/>
+                                            </p:selectOneMenu>
+                                        </f:facet>
+                                    </p:column>
+                                </p:dataTable>
+                            </div>
+                        </div>
+                    </h:form>
+                    <p:divider/>
+                    <h:form id="serviceWebCreateForm">
+                        <h5 class="mt-5 mb-2">Editer un service web </h5>
+                        <div class="ui-fluid formgrid grid">
+
+                            <div class="field col-12 md:col-6">
+                                <p:outputLabel for="firstname1" value="Titre du service web"/>
+                                <p:inputText id="firstname1" required="true"/>
+                            </div>
+                            <div class="field col-12 md:col-6">
+                                <p:outputLabel value="Type de service web" for="@next"/>
+                                <p:selectOneMenu id="typeserviceweb" required="true">
+                                    <f:selectItem itemLabel="Selectionnez un type de service web"
+                                                  itemValue="#{null}"/>
+                                    <f:selectItem itemLabel="REST" itemValue="rest"/>
+                                    <f:selectItem itemLabel="SOAP" itemValue="soap"/>
+                                    <f:selectItem itemLabel="RPC" itemValue="rpc"/>
+                                    <f:selectItem itemLabel="WEB SOCKET" itemValue="websocket"/>
+                                </p:selectOneMenu>
+                            </div>
+
+                            <div class="field col-12 md:col-6">
+                                <p:outputLabel for="@next" value="Conditions d'utilisation"/>
+                                <p:inputText id="adress4" required="true"/>
+                            </div>
+                            <div class="field col-12 md:col-6">
+                                <p:outputLabel for="@next" value="Adresse ip et port de localisaton"/>
+                                <p:inputText id="adress5" required="true"/>
+                            </div>
+                            <div class="field col-12 md:col-6">
+                                <p:outputLabel for="@next" value="Nom du contact"/>
+                                <p:inputText id="adress6" required="true"/>
+                            </div>
+                            <div class="field col-12 md:col-6">
+                                <p:outputLabel for="@next" value="url du contact"/>
+                                <p:inputText id="adress7" required="true"/>
+                            </div>
+                            <div class="field col-12 md:col-6">
+                                <p:outputLabel for="@next" value="Email du contact"/>
+                                <p:inputText id="adress8" required="true"/>
+                            </div>
+                            <div class="field col-12 md:col-6">
+                                <p:outputLabel for="@next" value="Nom de la licence"/>
+                                <p:inputText id="adress9" required="true"/>
+                            </div>
+                            <div class="field col-12 md:col-6">
+                                <p:outputLabel for="@next" value="Identifiant de la licence"/>
+                                <p:inputText id="adress10" required="true"/>
+                            </div>
+                            <div class="field col-12 md:col-6">
+                                <p:outputLabel for="@next" value="Url de la licence"/>
+                                <p:inputText id="adress11" required="true"/>
+                            </div>
+                            <div class="field col-12 md:col-6">
+                                <p:outputLabel for="@next" value="Version du service web"/>
+                                <p:inputText id="adress12" required="true"/>
+                            </div>
+                            <div class="field col-12 md:col-6">
+                                <p:outputLabel for="@next" value="Chemin de localisaton du service web"/>
+                                <p:inputText id="adress15" required="true"/>
+                            </div>
+                            <div class="field col-12 md:col-6">
+                                <p:outputLabel for="@next" value="Résumé du service web"/>
+                                <p:inputTextarea rows="5" maxlength="255" placeholder="Saisir un résumé..."/>
+                            </div>
+                            <div class="field col-12 md:col-6">
+                                <p:outputLabel for="@next" value="Description du service web"/>
+                                <p:inputTextarea rows="5" maxlength="255" placeholder="Saisir une description..."/>
+                            </div>
+
+                        </div>
+
+                        <div class="flex justify-content-start flex-wrap mt-2">
+                            <p:commandButton icon="pi pi-save"
+                                             value="Enregistrer" styleClass="w-auto mr-2"/>
+                            <p:commandButton icon="pi pi-times" value="Annuler" styleClass="w-auto mr-2"/>
+                            <p:commandButton icon="pi pi-trash" value="Retirer un service web"
+                                             styleClass="w-auto mt-2 md:mt-0 "/>
+                        </div>
+                    </h:form>
+                </p:tab>
+            </p:tabView>
+        </p:sidebar>
+        <p:sidebar widgetVar="activeSidebar" styleClass="w-full lg:w-6 h-full overflow-y-auto" position="right">
+            <h:form id="validationForm2">
+                <div class="grid">
+                    <div class="col">
+
+                        <h4 class="font-bold ">Activation d'un service</h4>
+                        <p:divider styleClass="mb-3"/>
+                        <div class="ui-fluid formgrid grid ">
+                            <div class="field col-12 md:col-12 ">
+                                <p:selectOneRadio id="line" value="#{null}"
+                                                  layout="lineDirection">
+                                    <f:selectItem itemLabel="Activer" itemValue="#{true}"/>
+                                    <f:selectItem itemLabel="Désactiver" itemValue="#{false}"/>
+                                </p:selectOneRadio>
+                            </div>
+                            <div class="field col-12 md:col-12 ">
+                                <p:outputLabel for="@next" value="Fairer une annotation"/>
+                                <p:inputTextarea rows="5" maxlength="255" placeholder="Saisir une annotation..."/>
+                            </div>
+                            <div class="field col-12 md:col-12 md:flex  ">
+                                <p:commandButton value="Enregistrer" update="@form"
+                                                 process="@this" icon="pi pi-save"
+                                                 styleClass="w-auto mr-2 "/>
+
+                                <p:commandButton value="Annuler" update="@form"
+                                                 process="@this" icon="pi pi-times"
+                                                 styleClass="w-auto "/>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </h:form>
+        </p:sidebar>
+    </ui:define>
+
+</ui:composition>

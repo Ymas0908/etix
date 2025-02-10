@@ -1,0 +1,109 @@
+<ui:composition xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns="http://www.w3.org/1999/xhtml"
+                template="/WEB-INF/template.xhtml">
+    <ui:define name="title">Historisation des plans de commissions</ui:define>
+
+    <ui:define name="viewname">
+        <li>PLAN DE COMMISSION</li>
+        <li><i class="pi pi-chevron-right"></i></li>
+        <li>
+            <p:link outcome="/gestion-plan-commission-frais-service/historique-plan-commission">SUPPRESSION DES FRAIS DE REPARTITIONS HISTORISES</p:link>
+        </li>
+    </ui:define>
+
+    <ui:define name="content">
+        <h:form id="hitoriqueTableform">
+            <div class="grid">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="grid">
+                            <div class="col-10 md:col-8">
+                                <h3 class="font-bold mb-2">Suppression des frais de repartitions historisés</h3>
+                                <h6 class="mb-2"><i class="pi pi-info-circle"> </i>
+                                    Saisir les critères de recherche
+                                </h6>
+                                <div class="ui-fluid formgrid grid ">
+                                    <div class="field col-12 md:col-4">
+                                        <p:inputText id="planCommissionTableRaisonSearch"
+                                                     value="#{gestionDePlanCommissionMB.raisonSociale}"
+                                                     placeholder="Raison sociale du promoteur"/>
+                                    </div>
+                                    <div class="field col-12 md:col-4">
+                                        <p:inputText id="planCommissionTableServiceSearch"
+                                                     value="#{gestionDePlanCommissionMB.libelle}"
+                                                     placeholder="Libellé du service promoteur"/>
+                                    </div>
+                                    <div class="field col-12 md:col-3 flex">
+                                        <p:commandButton value="Rechercher" icon="pi pi-search"
+                                                         action="#{gestionDePlanCommissionMB.rechercher()}"
+                                                         update="hitoriqueTableform"
+                                                         styleClass="lg:w-auto"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex mt-3 mb-2">
+                            <div class="flex-1 flex flex-column">
+                                <h5 class="my-3 ">Liste des frais historisés
+                                    (#{gestionDePlanCommissionMB.historiqueFraisList.size()})</h5>
+                            </div>
+                            <div class="flex align-items-center justify-content-center">
+                                <p:commandButton icon="pi pi-trash"
+                                                 value="Supprimer"
+                                                 action="#{gestionDePlanCommissionMB.supprimerLesHistoriques()}"
+                                                 update="hitoriqueTableform"
+                                                 styleClass="lg:w-auto">
+                                    <p:confirm header="Attention!"
+                                               message="Voulez-vous vraiment supprimer ces frais de services selectionnés ?"
+                                               icon="pi pi-info-circle"/>
+                                </p:commandButton>
+                            </div>
+                        </div>
+                        <div class="grid">
+                            <div class="col-12">
+                                <p:dataTable widgetVar="dtHistoriqueCommission"
+                                             var="histo"
+                                             value="#{gestionDePlanCommissionMB.historiqueFraisList}"
+                                             reflow="true"
+                                             selection="#{gestionDePlanCommissionMB.historiqueFraisListSelect}"
+                                             styleClass="contrib-table" emptyMessage="Pas de données"
+                                             rowKey="#{histo.ID}" scrollable="true"
+                                             scrollHeight="500">
+                                    <p:column selectionMode="multiple" style="width:16px;text-align:center"/>
+                                    <p:column headerText="Promoteur">
+                                        <h:outputText
+                                                value="#{histo.fraisArepartir.contributeurPromoteur.raisonSociale}"/>
+                                    </p:column>
+
+                                    <p:column headerText="Type de frais">
+                                        <h:outputText value="#{histo.fraisArepartir.typeFrais}"/>
+                                    </p:column>
+
+                                    <p:column headerText="Bénéficiaire">
+                                        <h:outputText
+                                                value="#{histo.fraisArepartir.contributeurBeneficiaire.raisonSociale}"/>
+                                    </p:column>
+                                    <p:column headerText="Service">
+                                        <h:outputText
+                                                value="#{histo.fraisArepartir.service.libelle}"/>
+                                    </p:column>
+                                    <!--                                    <p:column headerText="Action" width="5em">-->
+                                    <!--                                        <p:commandButton icon="pi pi-eye"-->
+                                    <!--                                                         title="Details de l'historisation"-->
+                                    <!--                                                         styleClass="rounded-button ui-button">-->
+
+                                    <!--                                        </p:commandButton>-->
+                                    <!--                                    </p:column>-->
+                                </p:dataTable>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </h:form>
+
+    </ui:define>
+</ui:composition>
+

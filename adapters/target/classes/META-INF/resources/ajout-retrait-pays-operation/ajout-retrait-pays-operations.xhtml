@@ -1,0 +1,259 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="title">Ajout / retrait de pays d'opération</ui:define>
+
+    <ui:define name="viewname">
+        <li>AJOUT / RETRAIT DE PAYS D'OPERATION</li>
+        <li><i class="pi pi-chevron-right"></i></li>
+        <li>
+            <p:link outcome="/ajout-retrait-pays-operation/ajout-retrait-pays-operations">AJOUT / RETRAIT DE PAYS D'OPERATION</p:link>
+        </li>
+    </ui:define>
+
+    <ui:define name="content">
+        <h:form id="contributeurForm">
+            <div class="grid">
+                <div class="col-12">
+                    <div class="card">
+                        <!--                        div de recherche de contributeur-->
+                        <div class="grid">
+                            <div class="col-12">
+                                <h3 class="font-bold mb-4">Ajout et retrait de pays d'opération</h3>
+                                <h6 class="mb-2"><i class="pi pi-info-circle"> </i> Saisir le critère de recherche
+                                </h6>
+                                <div class="ui-fluid formgrid grid ">
+                                    <div class="field col-12 md:col-4">
+                                        <p:inputText id="contribRais" placeholder="Saisir la raison sociale"
+                                                     value="#{ajoutRetraitDePaysOperationMB.raisonSociale}"/>
+                                    </div>
+                                    <div class="field col-12 md:col-3 flex">
+                                        <p:commandButton value="Rechercher" update="contributeurForm"
+                                                         action="#{ajoutRetraitDePaysOperationMB.collecterLesContributeursByRaisonSociale()}"
+                                                         icon="pi pi-search"
+                                                         styleClass="ml-2  lg:w-auto"/>
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <!--                        liste des contributeurs-->
+                        <div class="flex mt-3 mb-2">
+                            <div class="flex-1 flex flex-column">
+                                <h5>Liste des contributeurs (#{ajoutRetraitDePaysOperationMB.contributeurs.size()})</h5>
+                            </div>
+                        </div>
+
+                        <div class="grid">
+                            <div class="col-12">
+                                <p:dataTable id="contribs" widgetVar="dtContribs"
+                                             var="contrib" value="#{ajoutRetraitDePaysOperationMB.contributeurs}"
+                                             reflow="true"
+                                             selection="#{ajoutRetraitDePaysOperationMB.contributeur}"
+                                             emptyMessage="Aucun contributeur trouvé"
+                                             lazy="false"
+                                             rowKey="#{contrib.ID}" scrollable="true" scrollHeight="260px"
+                                             SelectMode="single">
+                                    <p:ajax event="rowSelect"
+                                            listener="#{ajoutRetraitDePaysOperationMB.collecterPaysRattacheEtNonRattacher()}"
+                                            update="paysNonRattacheForm,paysRattacheForm"/>
+
+                                    <p:column headerText="Raison sociale">
+                                        <h:outputText value="#{contrib.raisonSociale}"/>
+                                    </p:column>
+                                    <p:column headerText="Nom du dirigeant">
+                                        <h:outputText value="#{contrib.nomDirigeant}"/>
+                                    </p:column>
+                                    <p:column headerText="Type du contributeur">
+                                        <h:outputText value="#{contrib.typeContributeur.toString()}"/>
+                                    </p:column>
+
+                                </p:dataTable>
+
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </h:form>
+
+        <!--                        listes des pays rattachées et non rattachées-->
+        <div class="grid mt-1">
+            <div class="col-12 md:col-6 lg:col-6">
+                <h:form id="paysNonRattacheForm">
+                    <div class="card">
+                        <h5 class="ui-subtitle">Liste des pays non rattachés (#{ajoutRetraitDePaysOperationMB.listPaysNonRattaches.size()})</h5>
+                        <div class="ui-form-icon flex mb-2">
+                            <i class="pi pi-info-circle mr-1"></i>
+                            <span>Veuillez selectionner les pays ci-dessous et cliquer sur le boutton "Rattacher"</span>
+                        </div>
+                        <p:dataTable scrollable="true" scrollHeight="200px" scrollRows="20"
+                                     var="paysNonRattache" lazy="true"
+                                     emptyMessage="Aucune pays non rattaché trouvé."
+                                     value="#{ajoutRetraitDePaysOperationMB.listPaysNonRattaches}"
+                                     selection="#{ajoutRetraitDePaysOperationMB.paysNonRattachSelec}"
+                                     rowKey="#{paysNonRattache.ID}" style="margin-bottom:0; height: 250px">
+                            <p:column selectionMode="multiple"
+                                      style="width:16px;text-align:center"/>
+
+                            <!--                            <p:ajax event="rowSelect"-->
+                            <!--                                    listener="#{ajoutRetraitDePaysOperationMB.paysNonRattachSelec()}"-->
+                            <!--                                    update="paysNonRattacheForm,paysRattacheForm"/>-->
+
+                            <p:column headerText="Indicatif international">
+                                <h:outputText value="#{paysNonRattache.indicatifInternational}"/>
+                            </p:column>
+                            <p:column headerText="Nom">
+                                <h:outputText value="#{paysNonRattache.nom}"/>
+                            </p:column>
+                        </p:dataTable>
+                        <div class="p-col-12 p-lg-6 p-md-6">
+                            <p:commandButton style="width: 100px; margin-top: 3%"
+                                             process="paysNonRattacheForm"
+                                             update="paysRattacheForm,paysNonRattacheForm"
+                                             icon="pi pi-save" title="Cliquez ici pour Rattacher"
+                                             action="#{ajoutRetraitDePaysOperationMB.rattacherLesPaysSelectionnesAuContributeur()}"
+                                             value="Rattacher"/>
+                        </div>
+                    </div>
+                </h:form>
+            </div>
+            <div class="col-12 md:col-6 lg:col-6">
+                <h:form id="paysRattacheForm">
+                    <div class="card">
+                        <h5 class="ui-subtitle">Liste des pays rattachés (#{ajoutRetraitDePaysOperationMB.listPaysRattaches.size()})</h5>
+                        <div class="ui-form-icon flex mb-2">
+                            <i class="pi pi-info-circle mr-1"></i>
+                            <span>Veuillez sélectionner les pays ci-dessous et cliquer sur le boutton "Détacher"</span>
+                        </div>
+                        <p:dataTable var="paysRattache" scrollable="true" scrollHeight="200px"
+                                     scrollRows="20" lazy="true"
+                                     value="#{ajoutRetraitDePaysOperationMB.listPaysRattaches}"
+                                     emptyMessage="Aucune mini-place rattachée trouvée."
+                                     selection="#{ajoutRetraitDePaysOperationMB.paysRattachSelec}"
+                                     rowKey="#{paysRattache.ID}" style="margin-bottom:0; height: 250px">
+                            <p:column selectionMode="multiple"
+                                      style="width:16px;text-align:center"/>
+
+                            <!--                            <p:ajax event="rowSelect"-->
+                            <!--                                    listener="# {ajoutRetraitDePaysOperationMB.paysRattachSelec()}"-->
+                            <!--                                    update="paysNonRattacheForm,paysRattacheForm"/>-->
+
+                            <p:column headerText="Indicatif international">
+                                <h:outputText value="#{paysRattache.indicatifInternational}"/>
+                            </p:column>
+                            <p:column headerText="Nom">
+                                <h:outputText value="#{paysRattache.nom}"/>
+                            </p:column>
+                            <p:column headerText="Action" width="4em">
+
+
+                                <p:commandButton icon="pi pi-pencil"
+                                                 action="#{ajoutRetraitDePaysOperationMB.showMarketPlace()}"
+                                                 title="Consulter"
+                                                 styleClass="edit-button rounded-button mr-1"
+                                                 process="@this">
+                                    <f:setPropertyActionListener value="#{paysRattache}"
+                                                                 target="#{ajoutRetraitDePaysOperationMB.pays}"/>
+                                </p:commandButton>
+
+                            </p:column>
+                        </p:dataTable>
+                        <div class="p-col-12 p-lg-6 p-md-6">
+                            <p:commandButton style="width: 100px; margin-top: 3%"
+                                             process="paysRattacheForm" title="Cliquez ici pour détacher"
+                                             update="paysNonRattacheForm,paysRattacheForm"
+                                             action="#{ajoutRetraitDePaysOperationMB.detacherUnPaysOperation()}"
+                                             icon="pi pi-trash" value="Détacher"/>
+                        </div>
+                    </div>
+                </h:form>
+            </div>
+        </div>
+
+
+        <!--                        Sidebar pour la gestion de mmp-->
+
+        <p:sidebar id="rattachementId" widgetVar="ServiceRattacherSidebar"
+                   styleClass="w-full lg:w-6 h-full overflow-y-auto"
+                   position="right">
+            <p:divider styleClass="mt-3"/>
+            <div class="grid">
+                <div class="col-12">
+                    <h:form id="mmpRattachepaysForm">
+                        <div class="card">
+                            <h5 class="ui-subtitle">Liste des mini-places de marché rattachées au pays (#{ajoutRetraitDePaysOperationMB.mmps.size()})</h5>
+
+                            <p:dataTable id="mmpRattachePaysid" widgetVar="mmpRattachePaysw"
+                                         var="mmpRattachePays" value="#{ajoutRetraitDePaysOperationMB.mmps}"
+                                         reflow="true"
+                                         selection="#{ajoutRetraitDePaysOperationMB.mmp}"
+                                         emptyMessage="Aucune mini-place de marché trouvée."
+                                         lazy="false"
+                                         rowKey="#{mmpRattachePays.id}" scrollable="true" scrollHeight="260px"
+                                         SelectMode="single">
+                                <p:ajax event="rowSelect"
+                                        listener="#{ajoutRetraitDePaysOperationMB.collecterServiceSelonMmp()}"
+                                        update="serviceRattacheForm"/>
+
+                                <p:column headerText="Libellé">
+                                    <h:outputText value="#{mmpRattachePays.libelle}"/>
+                                </p:column>
+                                <p:column headerText="Description">
+                                    <h:outputText value="#{mmpRattachePays.description}"/>
+                                </p:column>
+
+                                <p:column headerText="Statut">
+                                    <h:outputText value="#{mmpRattachePays.statutMmp}"/>
+                                </p:column>
+                            </p:dataTable>
+                        </div>
+                    </h:form>
+                </div>
+
+
+                <p:divider styleClass="mt-3"/>
+
+                <div class="field col-12 ">
+                    <h:form id="serviceRattacheForm">
+
+                        <!--                        <div class="card">-->
+
+                        <h5 class="ui-subtitle">Liste des services rattachés (#{ajoutRetraitDePaysOperationMB.services.size()})</h5>
+
+                        <div class="col-12 ui-form-icon flex">
+                            <p:dataTable id="idServices" widgetVar="wServices" var="service" scrollable="true"
+                                         scrollHeight="200px"
+                                         lazy="true"
+                                         value="#{ajoutRetraitDePaysOperationMB.services}"
+                                         emptyMessage="Aucun service rattaché trouvé."
+                                         rowKey="#{service.ID}"
+                                         style="margin-bottom:0; height: 250px">
+                                <p:column headerText="Libellé">
+                                    <h:outputText value="#{service.libelle}"/>
+                                </p:column>
+                                <p:column headerText="Description">
+                                    <h:outputText
+                                            value="#{service.description}"/>
+                                </p:column>
+                                <p:column headerText="Statut">
+                                    <h:outputText
+                                            value="#{service.statutService}"/>
+                                </p:column>
+
+                            </p:dataTable>
+                        </div>
+                    </h:form>
+                </div>
+            </div>
+        </p:sidebar>
+    </ui:define>
+
+</ui:composition>

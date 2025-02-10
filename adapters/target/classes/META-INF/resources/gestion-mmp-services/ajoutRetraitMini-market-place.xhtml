@@ -1,0 +1,238 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="title">Mini market place</ui:define>
+
+    <ui:define name="viewname">
+        <li>GESTION DES MINIS PLACES DE MARCHE</li>
+        <li><i class="pi pi-chevron-right"></i></li>
+        <li>
+            <p:link outcome="/gestion-mmp-services/ajoutRetraitMini-market-place">RATTACHER DES MINIS PLACES DE MARCHE A UN CONTRIBUTEUR</p:link>
+        </li>
+    </ui:define>
+
+    <ui:define name="content">
+        <!-- formulaire pour l'affichage du contributeur -->
+        <div class="grid">
+            <div class="col-12">
+                <!--formulaire pour la selection d'un contributeur-->
+                <h:form id="contributeurForm">
+                    <div class="card">
+                        <h3 class="font-bold "> Rattacher des mini-places de marche à un contributeur </h3>
+                        <h5 class="ui-subtitle">Liste des contributeurs (#{ajoutRetraitDeMmpAunContributeurMB.contributeurList.size()})</h5>
+                        <div class="ui-form-icon flex mb-2">
+                            <i class="pi pi-info-circle mr-1 mt-1"></i>
+                            <span>Veuillez sélectionner un contributeur</span>
+                        </div>
+                        <!--dataTable contributeur form id="contributeurForm"-->
+                        <p:dataTable id="contributeurdt" widgetVar="dtContributeur"
+                                     var="contributeur" value="#{ajoutRetraitDeMmpAunContributeurMB.contributeurList}"
+                                     reflow="true"
+                                     selection="#{ajoutRetraitDeMmpAunContributeurMB.contributeur}"
+                                     emptyMessage="Aucun contributeur trouvé"
+                                     lazy="false" rowKey="#{contributeur.ID}" scrollable="true" scrollHeight="260px"
+                                     selectionMode="single">
+                            <p:ajax event="rowSelect"
+                                    listener="#{ajoutRetraitDeMmpAunContributeurMB.updateListPays()}"
+                                    update="paysoperation,serviceNonRattache,serviceRattache"/>
+
+                            <!-- Header Raison sociale -->
+                            <p:column id="raisonSocial" headerText="Raison sociale"
+                                      filterBy="#{contributeur.raisonSociale}">
+                                <h:outputText value="#{contributeur.raisonSociale}"/>
+                            </p:column>
+                            <!-- Header Raison sociale -->
+
+                            <!-- Header Nom du dirigeant -->
+                            <p:column headerText="Nom du dirigeant" filterBy="#{contributeur.nomDirigeant}">
+                                <h:outputText value="#{contributeur.nomDirigeant}"/>
+                            </p:column>
+                            <!-- Header Nom du dirigeant -->
+
+                            <!-- Header Type du contributeur -->
+                            <p:column headerText="Type de contributeur" filterBy="#{contributeur.typeContributeur}">
+                                <f:facet name="filter">
+                                    <p:selectOneMenu onchange="PF('dtContributeur').filter()"
+                                                     styleClass="ui-custom-filter"
+                                                     value="#{ajoutRetraitDeMmpAunContributeurMB.typeContributeur}">
+                                        <f:selectItem itemLabel="TOUS" itemValue="#{null}"
+                                                      noSelectionOption="true"/>
+                                        <f:selectItems
+                                                value="#{ajoutRetraitDeMmpAunContributeurMB.listTypeContributeur}"/>
+                                    </p:selectOneMenu>
+                                </f:facet>
+                                <h:outputText value="#{contributeur.typeContributeur}"/>
+                            </p:column>
+                            <!-- Header Type du contributeur -->
+                        </p:dataTable>
+                        <!--dataTable contributeur form id="contributeurForm"-->
+                    </div>
+                </h:form>
+                <!--formulaire pour la selection d'un contributeur-->
+            </div>
+        </div>
+        <!-- formulaire pour l'affichage du contributeur -->
+        <div class="grid mt-1">
+            <div class="col-12 xl:col-12">
+                <h:form id="paysoperation">
+                    <div class="card">
+                        <div class="flex mt-2 mb-2">
+                            <div class="flex-1 flex flex-column">
+                                <h5>Liste des pays d'opérations (#{ajoutRetraitDeMmpAunContributeurMB.paysOperations.size()})</h5>
+                                <h6 class="mb-2">
+                                    <i class="pi pi-info-circle"></i> Sélectionner un pays dans la liste
+                                </h6>
+                            </div>
+                        </div>
+                        <div class="grid">
+                            <div class="col-12">
+                                <p:dataTable id="paysope"
+                                             scrollable="true"
+                                             scrollHeight="200"
+                                             reflow="true"
+                                             styleClass="products-table"
+                                             lazy="false"
+                                             var="paysop" value="#{ajoutRetraitDeMmpAunContributeurMB.paysOperations}"
+                                             emptyMessage="Aucun pays disponible"
+                                             rowKey="#{paysop.ID}"
+                                             selection="#{ajoutRetraitDeMmpAunContributeurMB.paysOperation}"
+                                             selectionMode="single">
+                                    <p:ajax event="rowSelect"
+                                            listener="#{ajoutRetraitDeMmpAunContributeurMB.updateListMmp()}"
+                                            update="serviceNonRattache,serviceRattache"/>
+                                    <p:column headerText="Code ISO">
+                                        <h:outputText value="#{paysop.codeIso}"/>
+                                    </p:column>
+                                    <p:column headerText="Code pays">
+                                        <h:outputText value="#{paysop.indicatifInternational}"/>
+                                    </p:column>
+                                    <p:column headerText="Libelle">
+                                        <h:outputText value="#{paysop.nom}"/>
+                                    </p:column>
+                                    <p:column headerText="Nationalité">
+                                        <h:outputText value="#{paysop.nationalite}"/>
+                                    </p:column>
+
+                                </p:dataTable>
+                            </div>
+                        </div>
+                    </div>
+                </h:form>
+            </div>
+        </div>
+        <!--div service rattache et service non rattache-->
+        <div class="grid mt-1">
+            <!--formulaire pour la selection d'un service non Rattache-->
+            <div class="col-12 md:col-6 lg:col-6">
+                <!--formulaire pour la selection d'un service non Rattache-->
+                <h:form id="serviceNonRattache">
+                    <div class="card">
+                        <div class="flex mt-3 mb-2">
+                            <div class="flex-1 flex flex-column">
+                                <h5>Liste des mini-places de marché non rattachées (#{ajoutRetraitDeMmpAunContributeurMB.listeMmpNonRattach.size()})</h5>
+                            </div>
+                        </div>
+
+                        <div class="ui-form-icon flex">
+                            <i class="pi pi-info-circle mr-1"></i>
+                            <span>Veuillez selectionner une ou plusieurs mini(s) place(s) de marché</span>
+                        </div>
+
+                        <!--dataTable service form id="serviceNonRattache"-->
+                        <p:dataTable scrollable="true" scrollHeight="200" scrollRows="20"
+                                     var="service" lazy="true" widgetVar="dtServiceNonRattache"
+                                     emptyMessage="Aucune mini-place de marché  trouvée"
+                                     value="#{ajoutRetraitDeMmpAunContributeurMB.listeMmpNonRattach}"
+                                     selection="#{ajoutRetraitDeMmpAunContributeurMB.mmpNonRattachSelec}"
+                                     rowKey="#{service.id}" style="margin-bottom:0; height: 250px">
+
+                            <p:column selectionMode="multiple" style="width:16px;text-align:center"/>
+
+                            <p:column headerText="Libelle" filterBy="#{service.libelle}" styleClass="uniform-column">
+                                <h:outputText value="#{service.libelle}"/>
+                            </p:column>
+
+                            <p:column headerText="Type" filterBy="#{service.typeMmp}">
+                                <h:outputText value="#{service.typeMmp.toString()}"/>
+                            </p:column>
+
+                        </p:dataTable>
+                        <!--dataTable service form id="serviceNonRattache"-->
+
+                        <div class="p-col-12 p-lg-6 p-md-6">
+                            <p:commandButton value="Rattacher" style="width: 100px; margin-top: 10%"
+                                             process="serviceNonRattache"
+                                             update="serviceNonRattache,serviceRattache"
+                                             disabled="#{ajoutRetraitDeMmpAunContributeurMB.listeMmpNonRattach.size() == 0}"
+                                             action="#{ajoutRetraitDeMmpAunContributeurMB.rattacherMmp()}"
+                                             icon="pi pi-save"/>
+                        </div>
+                        <!--dataTable service form id="serviceNonRattache"-->
+                    </div>
+                </h:form>
+                <!--formulaire pour la selection d'un service non Rattache-->
+            </div>
+            <!--formulaire pour la selection d'un service non Rattache-->
+
+
+            <!--div pour la selection d'un service Rattache-->
+            <div class="col-12 md:col-6 lg:col-6">
+                <!--formulaire pour la selection d'un service Rattache-->
+                <h:form id="serviceRattache">
+                    <div class="card">
+                        <div class="flex mt-3 mb-2">
+                            <div class="flex-1 flex flex-column">
+                                <h5>Liste des mini-places de marché rattachées (#{ajoutRetraitDeMmpAunContributeurMB.listeMmpRattach.size()})</h5>
+                            </div>
+                        </div>
+
+                        <div class="ui-form-icon flex">
+                            <i class="pi pi-info-circle mr-1"></i>
+                            <span>Veuillez selectionner une ou plusieurs mini(s) place(s) de marché</span>
+                        </div>
+
+                        <!--dataTable service form id="serviceRattache"-->
+                        <p:dataTable scrollable="true" scrollHeight="200" scrollRows="20"
+                                     var="service" lazy="true" widgetVar="dtServiceRattache"
+                                     emptyMessage="Aucune mini-place de marché  trouvée"
+                                     value="#{ajoutRetraitDeMmpAunContributeurMB.listeMmpRattach}"
+                                     selection="#{ajoutRetraitDeMmpAunContributeurMB.mmpRattachSelec}"
+                                     rowKey="#{service.id}" style="margin-bottom:0; height: 250px">
+
+                            <p:column selectionMode="multiple" style="width:16px;text-align:center"/>
+
+                            <p:column headerText="Libelle" filterBy="#{service.libelle}">
+                                <h:outputText value="#{service.libelle}"/>
+                            </p:column>
+
+                            <p:column headerText="Type" filterBy="#{service.typeMmp}">
+                                <h:outputText value="#{service.typeMmp.toString()}"/>
+                            </p:column>
+
+                        </p:dataTable>
+
+                        <div class="p-col-12 p-lg-6 p-md-6">
+                            <p:commandButton value="Detacher" style="width: 100px; margin-top: 10%"
+                                             process="serviceRattache"
+                                             update="serviceRattache,serviceNonRattache"
+                                             disabled="#{ajoutRetraitDeMmpAunContributeurMB.listeMmpRattach.size() == 0}"
+                                             action="#{ajoutRetraitDeMmpAunContributeurMB.detacherMmp()}"
+                                             icon="pi pi-save"/>
+                        </div>
+
+                        <!--dataTable service form id="serviceRattache"-->
+                    </div>
+                </h:form>
+                <!--formulaire pour la selection d'un service Rattache-->
+            </div>
+            <!--div pour la selection d'un service Rattache-->
+        </div>
+        <!--div service rattache et service non rattache-->
+
+    </ui:define>
+
+</ui:composition>
