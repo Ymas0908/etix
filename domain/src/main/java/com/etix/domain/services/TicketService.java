@@ -25,8 +25,5 @@ public class TicketService implements GererLesTickets {
         return gestionTicket.getAllTickets();
     }
 
-    @Override
-    public List<Tickets> getTypeByType(TypeTicket typeTicket) {
-        return null;
-    }
+
 }

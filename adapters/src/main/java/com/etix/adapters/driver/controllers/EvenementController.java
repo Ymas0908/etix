@@ -1,12 +1,12 @@
 package com.etix.adapters.driver.controllers;
 
+import com.etix.adapters.entities.EvenementEntity;
 import com.etix.domain.models.Evenement;
 import com.etix.domain.models.enumerations.TypeEvenement;
-import com.etix.domain.models.enumerations.TypeTicket;
+import com.etix.domain.ports.driver.GererLesEvenements;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,46 +15,51 @@ import java.util.List;
 @RequestMapping("etix/evenements/v1")
 public class EvenementController {
 
+    private GererLesEvenements gererLesEvenements;
+
+
 
     @PostMapping("/saveEvenement")
-    public ResponseEntity<String> saveEvenement(@RequestParam String evenement) {
-        System.out.println( evenement + "enregistré avec succès");
-        return ResponseEntity.ok(evenement);
+    public ResponseEntity<EvenementEntity> saveEvenement(@RequestBody Evenement evenement) {
+        try {
+            gererLesEvenements.saveEvenement(evenement);
+            System.out.println( evenement + "enregistré avec succès");
+            return ResponseEntity.ok().build();
+    }
+        catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().build();
+        }
     }
 
-    @GetMapping("/getEvenementsByDate")
-    public ResponseEntity<List<Evenement>> getEvenementsByDate(@RequestParam("date") LocalDateTime dateEvenement) {
-        List<Evenement> evenements = new ArrayList<>();
-        return ResponseEntity.ok(evenements);
+
+    @GetMapping("/getEvenementsByLieu")
+    public ResponseEntity<List<EvenementEntity>> getEvenementsByLieu( @RequestParam String lieu) {
+
+     try {
+    gererLesEvenements.getEvenementsByLieu(lieu);
+    return ResponseEntity.ok().build();
+       } catch (Exception e) {
+    e.printStackTrace();
+    return ResponseEntity.badRequest().build();
+}
     }
 
 
-    @GetMapping("/getEvenementsByLieu/{lieu}")
-    public ResponseEntity<Evenement> getEvenementsByLieu (@PathVariable("lieu") String lieu){
-        Evenement evenement = new Evenement();
-        evenement.setLieu(lieu);
-        return ResponseEntity.ok(evenement);
 
-    }
+    @GetMapping("/getEvenementsByType")
+    public ResponseEntity<List<EvenementEntity>> getEvenementsByType( @RequestParam TypeEvenement type) {
 
-    @GetMapping("/getByType")
-    public ResponseEntity<List<Evenement>> getEvenementsByType(@RequestParam("type") TypeEvenement type) {
-        List<Evenement> evenements = new ArrayList<>();
-        return ResponseEntity.ok(evenements);
-    }
-
-    @GetMapping("/getEvenements/{idEvenement}")
-    public ResponseEntity<List<Evenement>> getEvenements (@PathVariable("idEvenement") Integer idEvenement){
-        List<Evenement> evenements = new ArrayList<>();
-        return ResponseEntity.ok(evenements);
-    }
-
-    @GetMapping("/getEvenementsByLibelle/{libelle}")
-    public ResponseEntity<List<Evenement>> getEvenementsByLibelle (@PathVariable("libelle") String libelle){
-        List<Evenement> evenement = new ArrayList<>();
-
-
-
-        return ResponseEntity.ok(evenement);
+     try {
+    gererLesEvenements.getEvenementsByType(type);
+    return ResponseEntity.ok().build();
+       } catch (Exception e) {
+    e.printStackTrace();
+    return ResponseEntity.badRequest().build();
+}
     }
 }
+
+
+
+

@@ -23,7 +23,7 @@ public class EvenementEntity {
     private String nom;
     private String lieu;
     private LocalDateTime date;
-
+    @Enumerated(EnumType.STRING)
     private TypeEvenement typeEvenement;
 
     public static EvenementEntity toEntity(Evenement evenement) {

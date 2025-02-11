@@ -10,5 +10,4 @@ public interface GererLesTickets {
 
     Tickets saveTicket(Tickets tickets);
     List<Tickets> getAllTickets();
-    List<Tickets> getTypeByType(TypeTicket typeTicket);
 }

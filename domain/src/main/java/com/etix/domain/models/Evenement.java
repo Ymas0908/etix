@@ -83,28 +83,28 @@ public class Evenement {
         public Builder() {
         }
 
-        public Builder id(Integer val) {
-            id = val;
+        public Builder id(Integer id) {
+            this.id = id;
             return this;
         }
 
-        public Builder nom(String val) {
-            nom = val;
+        public Builder nom(String nom) {
+           this.nom = nom;
             return this;
         }
 
-        public Builder lieu(String val) {
-            lieu = val;
+        public Builder lieu(String lieu) {
+            this.lieu = lieu;
             return this;
         }
 
-        public Builder date(LocalDateTime val) {
-            date = val;
+        public Builder date(LocalDateTime date) {
+            this.date = date;
             return this;
         }
 
-        public Builder typeEvenement(TypeEvenement val) {
-            typeEvenement = val;
+        public Builder typeEvenement(TypeEvenement typeEvenement) {
+            typeEvenement = typeEvenement;
             return this;
         }
 
